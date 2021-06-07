@@ -35,7 +35,7 @@ const Welcome = styled.div`
   margin-left: 10%;
   text-align: left;
   font-size: 50px;
-  font-family: "Comic Sans MS";
+  font-family: "jf";
   font-weight: bold;
   // border: 2px solid black;
 `;
@@ -43,11 +43,11 @@ const SCF = styled.div`
   position: static;
   width: 1000px;
   height: 100px;
-  margin-top: 5%;
+  margin-top: 1%;
   margin-left: 10%;
   text-align: left;
   font-size: 50px;
-  font-family: "Comic Sans MS";
+  font-family: "jf";
   font-weight: bold;
   // border: 2px solid black;
   color: #ee786c;
