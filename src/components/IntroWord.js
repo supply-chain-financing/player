@@ -23,10 +23,6 @@ const Word = styled.div`
 `;
 
 export default function IntroWord({ show }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [check, setCheck] = useState(false);
-  const [showIntro, setShowIntro] = useState(false);
   let history = useHistory();
 
   return (

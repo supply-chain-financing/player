@@ -9,6 +9,8 @@ import Register from "./Pages/Register";
 import Retailer from "./Pages/Retailer";
 import Supplier from "./Pages/Supplier";
 import BasicInfo from "./components/BasicInfo";
+import Explanation from "./Pages/Explanation";
+import Match from "./Pages/Match";
 import {
   BrowserRouter as Router,
   Switch,
@@ -35,6 +37,8 @@ ReactDOM.render(
         <Route path="/Retailer" component={Retailer} />
         <Route path="/Supplier" component={Supplier} />
         <Route path="/basicinfo" exact component={BasicInfo} />
+        <Route path="/explanation" exact component={Explanation} />
+        <Route path="/match" exact component={Match} />
       </Switch>
     </Router>
   </React.StrictMode>,
