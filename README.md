@@ -1,6 +1,13 @@
-# Getting Started with Create React App
+# Folder 說明（src 內）
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+assets => 圖片素材、一些 css js 檔、粉圓體 ttf 檔案
+components => 外層的 BasicInfo.js ~ Question.js 是塞在開始畫面--> 匹配完成之前內的元件
+Sidebar.js 是在掛在 Admin 畫面中的痾 側邊欄位 轉換頁面用
+HistoryChart 資料夾 => 歷史報表元件們
+layouts => 因為 retailer 和 supplier 的畫面不太一樣， 所以我分成兩個 js 檔寫(RetailerAdmin、SupplierAdmin)
+Pages => Admin 畫面前的所有頁面(選角色、登入、註冊、匹配、開始、說明遊戲)
+TempData => 還沒串 api 放個假資料（還沒整理）
+Views => Sidebar 放的各種頁面（決策、現金流、歷年報表、交易契約、借貸契約、設定）
 
 ## Available Scripts
 
@@ -68,4 +75,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
 # player
