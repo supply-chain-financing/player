@@ -11,6 +11,9 @@ import Supplier from "./Pages/Supplier";
 import BasicInfo from "./components/BasicInfo";
 import Explanation from "./Pages/Explanation";
 import Match from "./Pages/Match";
+import SupplierAdmin from "./layouts/SupplierAdmin";
+import RetailerAdmin from "./layouts/RetailerAdmin";
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -39,6 +42,10 @@ ReactDOM.render(
         <Route path="/basicinfo" exact component={BasicInfo} />
         <Route path="/explanation" exact component={Explanation} />
         <Route path="/match" exact component={Match} />
+        <Route path="/supplieradmin" component={SupplierAdmin} />
+        <Redirect from="/supplieradmin" to="/supplieradmin/dashboard" />
+        <Route path="/retaileradmin" component={RetailerAdmin} />
+        <Redirect from="/retaileradmin" to="/retaileradmin/dashboard" />
       </Switch>
     </Router>
   </React.StrictMode>,

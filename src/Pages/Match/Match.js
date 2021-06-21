@@ -90,6 +90,12 @@ export default function Match({}) {
     renderSwitch(loading);
   }, [loading, matchStatus]);
 
+  // handle 下一步 Btn
+  function handleClick() {
+    history.push("/dashboard");
+  }
+
+  //如果有match成功 則換成Tick畫面
   function renderSwitch(param) {
     switch (param) {
       case true:
@@ -114,7 +120,7 @@ export default function Match({}) {
               <Button
                 variant="outline-secondary"
                 style={btnstyle}
-                href="/match"
+                onClick={handleClick()}
               >
                 {" "}
                 下一步
