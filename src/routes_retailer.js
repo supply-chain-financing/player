@@ -15,7 +15,7 @@ import SettingsIcon from "@material-ui/icons/Settings"; //setup 設定
 
 //import History Chart
 import Dashboard from "./Views/Dashboard/Dashboard";
-import CashFlow from "./components/HistoryChart/CashFlow";
+import DemandRef from "./components/HistoryChart/DemandRef";
 import Report from "./components/HistoryChart/Report";
 import Invoice from "./components/HistoryChart/Invoice";
 import LoanAgreement from "./components/HistoryChart/LoanAgreement";
@@ -30,16 +30,16 @@ const routes_retailer = [
     layout: "/retaileradmin",
   },
   {
-    path: "/cashflow",
-    name: "現金流",
-    icon: LocalAtmIcon,
-    component: CashFlow,
+    path: "/demandref",
+    name: "參考供需",
+    icon: ReceiptIcon,
+    component: DemandRef,
     layout: "/retaileradmin",
   },
   {
-    path: "/report",
-    name: "歷年報表",
-    icon: ReceiptIcon,
+    path: "/playerrecord",
+    name: "玩家紀錄",
+    icon: LocalAtmIcon,
     component: Report,
     layout: "/retaileradmin",
   },
