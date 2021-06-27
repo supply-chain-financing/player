@@ -92,7 +92,7 @@ export default function Match({}) {
 
   // handle 下一步 Btn
   function handleClick() {
-    history.push("/dashboard");
+    history.push("/bargainfirstretailer");
   }
 
   //如果有match成功 則換成Tick畫面
@@ -120,7 +120,7 @@ export default function Match({}) {
               <Button
                 variant="outline-secondary"
                 style={btnstyle}
-                onClick={handleClick()}
+                onClick={handleClick}
               >
                 {" "}
                 下一步
