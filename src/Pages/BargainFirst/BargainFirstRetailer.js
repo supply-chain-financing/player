@@ -1,11 +1,12 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import Form from "react-bootstrap/Form";
 
+import Form from "react-bootstrap/Form";
 import Button from "@material-ui/core/Button";
-import Icon from "@material-ui/core/Icon";
+
 import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { useHistory } from "react-router-dom";
+import styled from "styled-components";
 
 import SendIcon from "@material-ui/icons/Send";
 import { css } from "@emotion/react";
@@ -13,29 +14,8 @@ import { css } from "@emotion/react";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
 
-const override = css`
-  display: block;
-  margin: 0 auto;
-  border-color: #f29979;
-  margin-top: 20%;
-`;
+import Loading from "../../components/Loading";
 
-const Block = styled.div`
-  position: static;
-  padding: 30px;
-  width: 50vw;
-  height: 50vh;
-  margin-top: 2vh;
-  margin-left: 2vw;
-  text-align: left;
-  font-size: 50px;
-  font-family: "jf";
-  font-weight: bold;
-  background-color: #ffffffd5;
-  border: 8px solid #adceed;
-  border-radius: 10px;
-  color: black;
-`;
 const Word = styled.div`
   position: static;
   font-size: 50px;
@@ -48,24 +28,40 @@ const Word = styled.div`
 const Content = styled.div`
   position: static;
   display: flex;
-  margin-top: 3%;
-  margin-left: 2%;
-  font-size: 20px;
+  margin-top: 1vh;
   font-family: "jf";
   font-weight: bold;
-  text-align: center;
+  text-align: left;
   //border: 2px solid black;
   color: black;
 `;
 const ContentWord = styled.div`
   position: static;
   width: 180px;
+  margin-top: 3%;
   margin-right: 5%;
   font-size: 30px;
   font-family: "jf";
   font-weight: bold;
-  text-align: center;
+  text-align: left;
   //border: 2px solid black;
+  color: black;
+`;
+
+const Block = styled.div`
+  position: static;
+  padding: 30px;
+  width: 700px;
+  height: 480px;
+  margin-top: 10%;
+  margin-left: 30vw;
+  text-align: left;
+  font-size: 50px;
+  font-family: "jf";
+  font-weight: bold;
+  background-color: #ffffffd5;
+  border: 8px solid #f29979;
+  border-radius: 30px;
   color: black;
 `;
 const ContentFooter = styled.div`
@@ -114,15 +110,17 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "42%",
   },
 }));
-export default function Bargain() {
+
+export default function BargainFirst_retailer({}) {
   const [money, setMoney] = useState(0);
   const [creditTerm, setCreditTerm] = useState(0);
   const [creditLine, setCreditLine] = useState(0);
   const [amount, setAmount] = useState("");
-  const [matchStatus, setMatchStatus] = useState(false);
+  const [status, setStatus] = useState("true");
   const [isFocused, setIsFocused] = useState(false);
 
   const classes = useStyles();
+  let history = useHistory();
 
   const handleChange = (event) => {
     setAmount(event.target.value);
@@ -133,6 +131,7 @@ export default function Bargain() {
 
   function tempSubmit(e) {
     e.preventDefault();
+    setStatus("false");
     // axios
     //   .post("", {
     //     values: [value1, value2, value3],
@@ -147,28 +146,102 @@ export default function Bargain() {
     alert("數量：" + amount);
   }
 
-  //等待供應商定價
-  setTimeout(function () {
-    // setLoading(false);
-    setMatchStatus(true);
-  }, 1000);
-  // useEffect(() => {
-  //   renderSwitch(matchStatus);
-  // }, [matchStatus]);
+  function handleFinal() {
+    setStatus("final");
+  }
 
   function validateForm() {
     return amount != "";
   }
+  function handleIntoAdmin() {
+    history.push("/retaileradmin");
+  }
 
   //從等供應商定價畫面 => 議價表單出來
-  //如果有match成功 則換成Tick畫面
   function renderSwitch(param) {
     switch (param) {
-      case true:
+      case "true":
         return (
-          <Form onSubmit={tempSubmit}>
+          <>
+            <Word>議價</Word>
+            <Form onSubmit={tempSubmit}>
+              <Content>
+                <ContentWord>對方價格</ContentWord>
+                <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
+              </Content>
+              <Content>
+                <ContentWord>Credit Term</ContentWord>
+                <ContentWord style={{ color: "#757ce8" }}>
+                  {creditTerm}
+                </ContentWord>
+              </Content>
+              <Content>
+                <ContentWord>Credit Line</ContentWord>
+                <ContentWord style={{ color: "#757ce8" }}>
+                  {creditLine}
+                </ContentWord>
+              </Content>
+              <Content>
+                <ContentWord>數量</ContentWord>
+                <ContentWord style={{ color: "#757ce8" }}>
+                  <NativeSelect
+                    id="demo-customized-select-native"
+                    value={amount}
+                    onChange={handleChange}
+                    input={<BootstrapInput />}
+                    onFocus={handleFocus}
+                    style={{
+                      borderBottomColor: isFocused ? "#f29979" : "#f29979",
+                      width: "200px",
+                    }}
+                  >
+                    <option aria-label="選擇產業" value="" />
+                    <option value={100}>100 </option>
+                    <option value={200}>200</option>
+                    <option value={300}>300</option>
+                  </NativeSelect>
+                </ContentWord>
+              </Content>
+
+              <ContentFooter style={{}}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  className={classes.button}
+                  endIcon={<SendIcon />}
+                  onClick={tempSubmit}
+                  disabled={!validateForm()}
+                >
+                  下一步
+                </Button>
+              </ContentFooter>
+            </Form>
+          </>
+        );
+      case "false":
+        return (
+          <>
+            <Word>等待企業傳送契約</Word>
+            <Loading />
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              className={classes.button}
+              endIcon={<SendIcon />}
+              onClick={handleFinal}
+            >
+              下一步
+            </Button>
+          </>
+        );
+      case "final":
+        return (
+          <>
+            <Word>契約產生</Word>
             <Content>
-              <ContentWord>對方價格</ContentWord>
+              <ContentWord>價格</ContentWord>
               <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
             </Content>
             <Content>
@@ -184,27 +257,9 @@ export default function Bargain() {
               </ContentWord>
             </Content>
             <Content>
-              <ContentWord>數量</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>
-                <NativeSelect
-                  id="demo-customized-select-native"
-                  value={amount}
-                  onChange={handleChange}
-                  input={<BootstrapInput />}
-                  onFocus={handleFocus}
-                  style={{
-                    borderBottomColor: isFocused ? "#f29979" : "#f29979",
-                    width: "200px",
-                  }}
-                >
-                  <option aria-label="選擇產業" value="" />
-                  <option value={100}>100 </option>
-                  <option value={200}>200</option>
-                  <option value={300}>300</option>
-                </NativeSelect>
-              </ContentWord>
+              <ContentWord>Credit Line</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>{amount}</ContentWord>
             </Content>
-
             <ContentFooter style={{}}>
               <Button
                 variant="contained"
@@ -212,13 +267,12 @@ export default function Bargain() {
                 size="large"
                 className={classes.button}
                 endIcon={<SendIcon />}
-                onClick={tempSubmit}
-                disabled={!validateForm()}
+                onClick={handleIntoAdmin}
               >
-                送出
+                進入決策中心
               </Button>
             </ContentFooter>
-          </Form>
+          </>
         );
       default:
         return <></>;
@@ -227,10 +281,7 @@ export default function Bargain() {
 
   return (
     <>
-      <Block>
-        <Word>{matchStatus ? "議價" : "供應商傳送契約中..."}</Word>
-        {renderSwitch(matchStatus)}
-      </Block>
+      <Block>{renderSwitch(status)}</Block>
     </>
   );
 }

@@ -1,151 +1,208 @@
-import React from "react";
-import { makeStyles, createMuiTheme } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import Checkbox from "@material-ui/core/Checkbox";
-import TableRow from "@material-ui/core/TableRow";
-import Button from "@material-ui/core/Button";
-import { green } from "@material-ui/core/colors";
-import AddIcon from "@material-ui/icons/Add";
-//table 欄位
-const columns = [
-  { id: "code", label: "代碼", minWidth: 70 },
-  { id: "name", label: "公司名稱", minWidth: 40 },
-  { id: "buy", label: "買進", minWidth: 40, align: "right" },
-  {
-    id: "sell",
-    label: "賣出",
-    minWidth: 40,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "finalPrice",
-    label: "成交價",
-    minWidth: 40,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "UpsAndDowns",
-    label: "漲跌",
-    minWidth: 40,
-    align: "right",
-    format: (value) => value.toFixed(2),
-  },
-  {
-    id: "buyBtn",
-    label: "購入",
-    minWidth: 40,
-    align: "right",
-  },
-];
+import NativeSelect from "@material-ui/core/NativeSelect";
+import InputBase from "@material-ui/core/InputBase";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import BootStrapTable from "react-bootstrap-table-next";
+import paginationFactory, {
+  PaginationFactory,
+} from "react-bootstrap-table2-paginator";
+import { Button } from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
+import styled from "styled-components";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import Form from "react-bootstrap/Form";
 
-function createData(code, name, buy, sell, finalPrice, UpsAndDowns, object) {
-  return { code, name, buy, sell, finalPrice, UpsAndDowns, object };
-}
-//拿投資資料
-const rows = [
-  createData(8644, "華研國際", 208.5, 210.0, 210.0, 1.0),
-  createData(8644, "華研國際", 208.5, 210.0, 210.0, 1.0),
-  createData(8644, "華研國際", 208.5, 210.0, 210.0, 1.0),
-  createData(8644, "華研國際", 208.5, 210.0, 210.0, 1.0),
-  createData(8644, "華研國際", 208.5, 210.0, 210.0, 1.0),
-];
-const useStyles = makeStyles((theme) => ({
+const ModalPlace = styled.div`
+  margin-top: 1vh;
+  //border: 2px solid black;
+`;
+const BootstrapInput = withStyles((theme) => ({
   root: {
-    width: "100%",
+    "label + &": {
+      marginTop: theme.spacing(2),
+      fontFamily: "jf",
+    },
   },
-  container: {
-    maxHeight: 440,
-    // border: "2px solid black",
+  input: {
+    borderRadius: 10,
+    position: "relative",
+    backgroundColor: theme.palette.background.paper,
+    border: "1px solid #adceed",
+    fontFamily: "jf",
+    fontSize: 16,
+    padding: "10px 26px 10px 12px",
+    transition: theme.transitions.create(["border-color", "box-shadow"]),
+    // Use the system font instead of the default Roboto font.
+    fontFamily: ["jf"].join(","),
+    "&:focus": {
+      borderRadius: 4,
+      borderColor: "#f29979",
+      boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)",
+      fontFamily: "jf",
+    },
   },
-  button: {
-    marginRight: theme.spacing(1),
-    border: "2px solid black",
-  },
-}));
-const theme = createMuiTheme({
-  palette: {
-    primary: green,
-  },
-});
+}))(InputBase);
 
 export default function Investment() {
-  const classes = useStyles();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [stock, setStock] = useState([]);
+  const [modalInfo, setModalInfo] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const [amount, setAmount] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+
+  const data = [
+    {
+      stockId: "1",
+      stockName: "大宇資訊",
+      sharePrice: 8.3,
+      expectedReturn: 10.65,
+      riskFactor: 2,
+    },
+    {
+      stockId: "2",
+      stockName: "SM榨乾機",
+      sharePrice: 8.3,
+      expectedReturn: 10.65,
+      riskFactor: 2,
+    },
+    {
+      stockId: "3",
+      stockName: "JPY cody悲慘事業",
+      sharePrice: 8.3,
+      expectedReturn: 10.65,
+      riskFactor: 2,
+    },
+  ];
+
+  const getData = async () => {
+    try {
+      // const data = await axios.get("");
+      // setStock(data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const columns = [
+    { dataField: "stockId", text: "代碼" },
+    { dataField: "stockName", text: "公司名稱" },
+    { dataField: "sharePrice", text: "買進價格" },
+    { dataField: "expectedReturn", text: "預期收益" },
+    { dataField: "riskFactor", text: "風險因子" },
+  ];
+
+  const rowEvents = {
+    onClick: (e, row) => {
+      setModalInfo(row);
+      toggleTrueFalse();
+    },
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+  const toggleTrueFalse = () => {
+    setShowModal(handleShow);
+  };
+  //買進的dropdownlist
+  const handleChange = (event) => {
+    setAmount(event.target.value);
+  };
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+  //買進 api
+  function tempSubmit(e) {
+    e.preventDefault();
+    // axios
+    //   .post("", {
+    //     values: [value1, value2, value3],
+    //   })
+    //   .then((res) => {
+    //     if (res.data) {
+    //     } else alert("回傳錯誤");
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+    alert("數量：" + amount);
+  }
+  function validateForm() {
+    return amount != "";
+  }
+
+  const ModalContent = () => {
+    return (
+      <Modal
+        show={show}
+        onHide={handleClose}
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{modalInfo.stockName}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={tempSubmit}>
+            <ul>
+              <ol>股票編號：{modalInfo.stockId}</ol>
+              <ol>股價（一股）：{modalInfo.sharePrice}</ol>
+              <ol>預期收益：{modalInfo.expectedReturn}</ol>
+              <ol>風險因子：{modalInfo.riskFactor}</ol>
+              <ol>
+                買進：
+                <NativeSelect
+                  id="demo-customized-select-native"
+                  value={amount}
+                  onChange={handleChange}
+                  input={<BootstrapInput />}
+                  onFocus={handleFocus}
+                  style={{
+                    borderBottomColor: isFocused ? "#f29979" : "#f29979",
+                    width: "200px",
+                  }}
+                >
+                  <option aria-label="選擇產業" value="" />
+                  <option value={1}>1 </option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                </NativeSelect>
+                <Button
+                  variant="primary"
+                  onClick={tempSubmit}
+                  disabled={!validateForm()}
+                  style={{ marginLeft: "1vw" }}
+                >
+                  買！
+                </Button>
+              </ol>
+            </ul>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            關閉
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   };
 
   return (
-    <Paper className={classes.root}>
-      <TableContainer className={classes.container}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <>
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === "number"
-                              ? column.format(value)
-                              : value}
-                          </TableCell>
-                        </>
-                      );
-                    })}
-                    {/* <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.button}
-                      endIcon={<AddIcon />}
-                    ></Button> */}
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
+    <>
+      <BootStrapTable
+        keyField="stockId"
+        data={data}
+        columns={columns}
+        pagination={paginationFactory()}
+        rowEvents={rowEvents}
       />
-    </Paper>
+      <ModalPlace>{show ? <ModalContent /> : null}</ModalPlace>
+    </>
   );
 }

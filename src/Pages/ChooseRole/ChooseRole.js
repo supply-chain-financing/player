@@ -11,6 +11,12 @@ import styled from "styled-components";
 import supplier from "../../assets/role.png";
 import retailer from "../../assets/role.png";
 
+import Modal from "react-bootstrap/Modal";
+
+const ModalPlace = styled.div`
+  margin-top: 1vh;
+  //border: 2px solid black;
+`;
 const Background = styled.div`
   background-color: #b9d8da;
   box-sizing: border-box;
@@ -51,9 +57,10 @@ const Choose = styled.div`
 
 const RoleBlock = styled.div`
   display: inline-flex;
+  gap: 10vw;
+  width: 100%;
   // border: 2px solid black;
-  margin-left: 20vw;
-  text-align: center;
+  justify-content: center;
 `;
 
 const SupplierBlock = styled.div`
@@ -62,12 +69,11 @@ const SupplierBlock = styled.div`
   width: 200px;
   height: 300px;
   margin-top: 5%;
-  margin-left: 10vw;
   text-align: center;
   font-size: 50px;
   font-family: "jf";
   font-weight: bold;
-  // border: 2px solid black;
+  //border: 2px solid black;
   color: #ee786c;
 `;
 const RetailerBlock = styled.div`
@@ -76,41 +82,115 @@ const RetailerBlock = styled.div`
   width: 200px;
   height: 300px;
   margin-top: 5%;
-  margin-left: 20vw;
   text-align: center;
   font-size: 50px;
   font-family: "jf";
   font-weight: bold;
-  // border: 2px solid black;
+  //border: 2px solid black;
   color: #ee786c;
 `;
 
 export default function ChooseRole() {
+  const [role, setRole] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  let history = useHistory();
+
+  function toggleTrueFalse() {
+    setShowModal(handleShow);
+  }
+
+  //選擇角色開啟modal
+  function tempSubmit(e) {
+    setRole(e.target.value);
+    toggleTrueFalse();
+  }
+  function handleChoice() {
+    // axios
+    //   .post("", {
+
+    //   })
+    //   .then((res) => {
+    //     if (res.data) {
+    //       history.push();
+    //     } else alert("回傳錯誤");
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+    //之後會把這行註解
+    if (role === "supplier") {
+      history.push("/supplier");
+    } else {
+      history.push("/retailer");
+    }
+  }
+
+  const ModalContent = () => {
+    return (
+      <Modal
+        show={show}
+        onHide={handleClose}
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        {/* <Modal.Header closeButton>
+          <Modal.Title>{modalInfo.loanAgreementId}</Modal.Title>
+        </Modal.Header> */}
+        <Modal.Body>確定要選擇{role}嗎？</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleChoice}>
+            確定
+          </Button>
+          <Button variant="secondary" onClick={handleClose}>
+            取消
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
   return (
     <Background>
       <SCF>Supply Chain Financing</SCF>
       <Choose>請選擇您的角色</Choose>
       <RoleBlock>
-        <Link to="/supplier">
-          <SupplierBlock>
+        <SupplierBlock>
+          <Button
+            variant="outline-light"
+            size="lg"
+            style={{ color: "#ee786c" }}
+            value={"supplier"}
+            onClick={tempSubmit}
+          >
             供應商
-            <img
-              src={supplier}
-              style={{ width: "200px", height: "200px", marginTop: "3vh" }}
-              to="./retailer"
-            />
-          </SupplierBlock>
-        </Link>
-        <Link to="/retailer">
-          <RetailerBlock>
+          </Button>
+          <img
+            src={supplier}
+            style={{ width: "200px", height: "200px", marginTop: "3vh" }}
+          />
+        </SupplierBlock>
+        <RetailerBlock>
+          <Button
+            variant="outline-light"
+            size="lg"
+            style={{ color: "#ee786c" }}
+            value={"retailer"}
+            onClick={tempSubmit}
+          >
             企業
-            <img
-              src={supplier}
-              style={{ width: "200px", height: "200px", marginTop: "3vh" }}
-            />
-          </RetailerBlock>
-        </Link>
+          </Button>
+          <img
+            src={supplier}
+            style={{ width: "200px", height: "200px", marginTop: "3vh" }}
+          />
+        </RetailerBlock>
       </RoleBlock>
+
+      <ModalPlace>{show ? <ModalContent /> : null}</ModalPlace>
     </Background>
   );
 }
