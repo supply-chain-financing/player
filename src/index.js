@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { Link, useHistory } from "react-router-dom";
 import Start from "./Pages/Start";
 import Login from "./Pages/Login";
 import ChooseRole from "./Pages/ChooseRole";
@@ -9,8 +8,11 @@ import Register from "./Pages/Register";
 import Retailer from "./Pages/Retailer";
 import Supplier from "./Pages/Supplier";
 import BasicInfo from "./components/BasicInfo";
+import BasicInfoSupplier from "./components/BasicInfoSupplier";
 import Explanation from "./Pages/Explanation";
+import ExplanationSupplier from "./Pages/Explanation/ExplanationSupplier";
 import Match from "./Pages/Match";
+import MatchSupplier from "./Pages/Match/MatchSupplier";
 import BargainFirstRetailer from "./Pages/BargainFirst/BargainFirstRetailer";
 import BargainFirstSupplier from "./Pages/BargainFirst/BargainSupplier";
 import SupplierAdmin from "./layouts/SupplierAdmin";
@@ -22,7 +24,6 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
@@ -42,8 +43,16 @@ ReactDOM.render(
         <Route path="/Retailer" component={Retailer} />
         <Route path="/Supplier" component={Supplier} />
         <Route path="/basicinfo" exact component={BasicInfo} />
+        <Route path="/basicinfosupplier" exact component={BasicInfoSupplier} />
+        <Route
+          path="/explanationsupplier"
+          exact
+          component={ExplanationSupplier}
+        />
         <Route path="/explanation" exact component={Explanation} />
+
         <Route path="/match" exact component={Match} />
+        <Route path="/matchsupplier" exact component={MatchSupplier} />
         <Route
           path="/bargainfirstretailer"
           exact

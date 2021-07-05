@@ -9,13 +9,52 @@ import paginationFactory, {
 import { Button } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import styled from "styled-components";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles, Card, CardContent } from "@material-ui/core";
 import Form from "react-bootstrap/Form";
+//已投資data
+import InvestData from "../../TempData/InvestData";
+import ScrollMenu from "react-horizontal-scrolling-menu";
 
 const ModalPlace = styled.div`
   margin-top: 1vh;
   //border: 2px solid black;
 `;
+const Title = styled.div`
+  margin: 1vh;
+  font-weight: bold;
+  font-size: 20px;
+`;
+const Block = styled.div`
+  position: static;
+  display: flex;
+  width: 95%;
+  margin-top: 2vh;
+  margin-left: 2vw;
+  margin-bottom: 2vw;
+  text-align: left;
+  font-family: "jf";
+  font-weight: bold;
+  background-color: none;
+  border: 8px solid #adceed;
+  border-radius: 10px;
+  color: black;
+`;
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "15rem",
+    marginRight: 20,
+    minHeight: "20vh",
+    fontFamily: "jf",
+    backgroundColor: "none",
+  },
+  title: {
+    fontSize: 30,
+  },
+  content: {
+    fontSize: 18,
+  },
+}));
+
 const BootstrapInput = withStyles((theme) => ({
   root: {
     "label + &": {
@@ -44,6 +83,9 @@ const BootstrapInput = withStyles((theme) => ({
 }))(InputBase);
 
 export default function Investment() {
+  const classes = useStyles();
+  //已投資股票
+  const [investData, setInvestData] = useState(InvestData);
   const [stock, setStock] = useState([]);
   const [modalInfo, setModalInfo] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -54,6 +96,11 @@ export default function Investment() {
 
   const [amount, setAmount] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [sellAmount, setSellAmount] = useState("");
+  const [sellBtn, setSellBtn] = useState(false);
+  const [sellModalInfo, setSellModalInfo] = useState([]);
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const handleSellClose = () => setSellBtn(false);
 
   const data = [
     {
@@ -105,6 +152,31 @@ export default function Investment() {
       toggleTrueFalse();
     },
   };
+  function handleSell(row) {
+    setSellBtn(true);
+    console.log(row);
+    setSellModalInfo(row);
+    toggleSellModalOpen();
+  }
+  const toggleSellModalOpen = () => {
+    setSellModalOpen(true);
+  };
+  //送出要賣的股票數量
+  function sellSubmit() {
+    // axios
+    //   .post("", {
+    //     values: [value1, value2, value3],
+    //   })
+    //   .then((res) => {
+    //     if (res.data) {
+    //     } else alert("回傳錯誤");
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+    alert("要賣出的數量：" + sellAmount + " 張");
+    handleSellClose();
+  }
 
   const toggleTrueFalse = () => {
     setShowModal(handleShow);
@@ -112,6 +184,10 @@ export default function Investment() {
   //買進的dropdownlist
   const handleChange = (event) => {
     setAmount(event.target.value);
+  };
+  //賣出的dropdownlist
+  const handleSellChange = (e) => {
+    setSellAmount(e.target.value);
   };
   const handleFocus = () => {
     setIsFocused(true);
@@ -131,9 +207,13 @@ export default function Investment() {
     //     console.log(error);
     //   });
     alert("數量：" + amount);
+    handleClose();
   }
   function validateForm() {
     return amount != "";
+  }
+  function validateSellForm() {
+    return sellAmount != "";
   }
 
   const ModalContent = () => {
@@ -195,6 +275,35 @@ export default function Investment() {
 
   return (
     <>
+      <Title>我的投資</Title>
+      {/* <Block> */}
+      <ScrollMenu
+        arrowLeft={
+          <div style={{ fontSize: "30px", margin: "0px" }}>{" < "}</div>
+        }
+        arrowRight={<div style={{ fontSize: "30px" }}>{" > "}</div>}
+        data={investData.map((item, i) => (
+          <tr key={i}>
+            <Card className={classes.root}>
+              <CardContent className={classes.content}>
+                公司名稱：{item.name}
+              </CardContent>
+              <CardContent className={classes.content}>
+                買進數量：{item.amount}
+              </CardContent>
+              <CardContent className={classes.content}>
+                當前賣出價格：{item.price}
+              </CardContent>
+              <CardContent className={classes.content}>
+                <Button onClick={() => handleSell(item)}>賣出</Button>
+              </CardContent>
+            </Card>
+          </tr>
+        ))}
+      />
+
+      {/* </Block> */}
+      <Title>投資市場</Title>
       <BootStrapTable
         keyField="stockId"
         data={data}
@@ -203,6 +312,62 @@ export default function Investment() {
         rowEvents={rowEvents}
       />
       <ModalPlace>{show ? <ModalContent /> : null}</ModalPlace>
+      <ModalPlace>
+        {sellBtn ? (
+          <Modal
+            show={sellModalOpen}
+            onHide={handleSellClose}
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>{sellModalInfo.name}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={sellSubmit}>
+                <ul>
+                  <ol>公司代碼：{sellModalInfo.id}</ol>
+                  <ol>目前擁有：{sellModalInfo.amount} 張</ol>
+                  <ol>目前賣出價格：＄{sellModalInfo.price}</ol>
+                  <ol>
+                    賣出：
+                    <NativeSelect
+                      id="demo-customized-select-native"
+                      value={sellAmount}
+                      onChange={handleSellChange}
+                      input={<BootstrapInput />}
+                      onFocus={handleFocus}
+                      style={{
+                        borderBottomColor: isFocused ? "#f29979" : "#f29979",
+                        width: "200px",
+                      }}
+                    >
+                      <option aria-label="選擇數量" value="" />
+
+                      <option value={1}>1 </option>
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                    </NativeSelect>
+                    <Button
+                      variant="primary"
+                      onClick={sellSubmit}
+                      disabled={!validateSellForm()}
+                      style={{ marginLeft: "1vw" }}
+                    >
+                      賣！
+                    </Button>
+                  </ol>
+                </ul>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleSellClose}>
+                關閉
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        ) : null}
+      </ModalPlace>
     </>
   );
 }

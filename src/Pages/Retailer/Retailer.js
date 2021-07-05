@@ -50,7 +50,7 @@ export default function Retailer() {
 
   return (
     <Background>
-      {showIntro ? <IntroWord /> : <Question />}
+      {showIntro ? <IntroWord /> : <Question Role={"retailer"} />}
       {check ? (
         <Button
           style={{

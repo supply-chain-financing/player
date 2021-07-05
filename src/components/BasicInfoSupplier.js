@@ -98,13 +98,35 @@ const BootstrapInput = withStyles((theme) => ({
   },
 }))(InputBase);
 
+const BeautifulButton = styled.button`
+position: static;
+margin: 10px 10px 10px 330px;
+color: #494949;
+width:80px;
+height: 40px;
+text-transform: uppercase;
+background: #ffffff;
+padding: 5px;
+font-size: 15px;
+border: 1px solid #494949;
+border-radius: 10px;
+display: inline-block;
+  border-radius: 30px,
+  transition: all 0.2s ease 0s;
+  &:hover {
+    color: #ffffff;
+    background: #f29979;
+    border-color: #f29979;
+    transition: all 0.2s ease 0s;
+  }
+`;
 const useStyles = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
   },
 }));
 
-export default function BasicInfo({}) {
+export default function BasicInfoSupplier({}) {
   const classes = useStyles();
   const [companyName, setCompanyName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -139,7 +161,7 @@ export default function BasicInfo({}) {
     //     console.log(error);
     //   });
     alert(companyName);
-    history.push("/explanation");
+    history.push("/explanationsupplier");
   }
   function validateForm() {
     return companyName != "" && industry != "";

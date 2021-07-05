@@ -50,7 +50,7 @@ export default function Login() {
     if (classNum === "123") {
       history.push("/chooserole");
     } else {
-      alert("要進入角色畫面請開窗大喊「我愛老金」");
+      alert("嘿嘿");
     }
   }
   function handleSubmit(event) {

@@ -47,11 +47,10 @@ const Block = styled.div`
   color: black;
 `;
 
-export default function Question({}) {
+export default function Question({ Role }) {
   const [value1, setValue1] = useState("yes");
   const [value2, setValue2] = useState("yes");
   const [value3, setValue3] = useState("yes");
-
   let history = useHistory();
   //問題字體格式
   let style = {
@@ -89,7 +88,11 @@ export default function Question({}) {
     //   .catch(function (error) {
     //     console.log(error);
     //   });
-    history.push("/basicinfo");
+    if (window.location.pathname === "/supplier") {
+      history.push("/basicinfosupplier");
+    } else {
+      history.push("/basicinfo");
+    }
   }
 
   return (
@@ -134,7 +137,7 @@ export default function Question({}) {
         <Button
           variant="outline-secondary"
           style={btnstyle}
-          onClick={() => handleClick()}
+          onClick={handleClick}
         >
           {" "}
           下一步

@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import {
+  makeStyles,
+  useTheme,
+  Badge,
+  Hidden,
+  Box,
+  IconButton,
+} from "@material-ui/core";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -8,15 +15,16 @@ import List from "@material-ui/core/List";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
+import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
+import Popover from "@material-ui/core/Popover";
+import InputIcon from "@material-ui/icons/Input";
+
 import { NavLink, useHistory, Switch, Route, Redirect } from "react-router-dom";
 import routes from "../routes_supplier";
 
@@ -81,6 +89,14 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  popover: {
+    pointerEvents: "none",
+    marginLeft: "85%",
+    marginTop: "2%",
+  },
+  paper: {
+    padding: theme.spacing(1),
+  },
 }));
 
 const switchRoutes = (
@@ -107,7 +123,17 @@ export default function SideForSup(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [notifications] = React.useState([]);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const popOpen = Boolean(anchorEl);
 
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -147,6 +173,42 @@ export default function SideForSup(props) {
             Supply-chain
             {/* 放Naver */}
           </Typography>
+          <Box flexGrow={1} />
+          <Hidden mdDown>
+            <IconButton color="inherit">
+              <Badge
+                badgeContent={notifications.length}
+                color="primary"
+                variant="dot"
+              >
+                <NotificationsIcon
+                  aria-owns={open ? "mouse-over-popover" : undefined}
+                  aria-haspopup="true"
+                  onMouseEnter={handlePopoverOpen}
+                  onMouseLeave={handlePopoverClose}
+                />
+                <Popover
+                  id="mouse-over-popover"
+                  open={popOpen}
+                  className={classes.popover}
+                  classes={{
+                    paper: classes.paper,
+                  }}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  onClose={handlePopoverClose}
+                >
+                  eMMMMM 有什麼事件
+                </Popover>
+              </Badge>
+            </IconButton>
+          </Hidden>
         </Toolbar>
       </AppBar>
       <Drawer

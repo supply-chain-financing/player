@@ -1,26 +1,9 @@
-const columns = [
-  { id: "name", label: "Name", minWidth: 170 },
-  { id: "code", label: "ISO\u00a0Code", minWidth: 100 },
-  {
-    id: "population",
-    label: "Population",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "size",
-    label: "Size\u00a0(km\u00b2)",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "density",
-    label: "Density",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toFixed(2),
-  },
+const InvestData = [
+  { id: "1", name: "Weekend Comes~", price: "309", amount: "89" },
+  { id: "2", name: "지앞영 ㅅㅅ", price: "805", amount: "99" },
+  { id: "5", name: "D.O", price: "112", amount: "93" },
+  { id: "6", name: "Weekend Comes~", price: "309", amount: "89" },
+  { id: "7", name: "지앞영 ㅅㅅ", price: "805", amount: "99" },
+  { id: "8", name: "D.O", price: "112", amount: "93" },
 ];
-export default columns;
+export default InvestData;

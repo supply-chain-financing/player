@@ -50,7 +50,7 @@ export default function Supplier() {
 
   return (
     <Background>
-      {showIntro ? <IntroWord /> : <Question />}
+      {showIntro ? <IntroWord /> : <Question Role={"supplier"} />}
       {check ? (
         <Button
           style={{
