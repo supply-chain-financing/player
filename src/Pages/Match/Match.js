@@ -66,7 +66,7 @@ const Block = styled.div`
   color: black;
 `;
 
-export default function Match({}) {
+export default function Match({ }) {
   let [matchStatus, setMatchStatus] = useState(false);
   let [matchText, setMatchText] = useState(
     matchStatus ? "匹配完成" : "匹配中..."

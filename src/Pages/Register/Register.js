@@ -40,22 +40,30 @@ const RegisterForm = styled.div`
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [check, setCheck] = useState(false);
   let history = useHistory();
   function validateForm() {
-    return email.length > 0 && password.length > 0;
+    return email.length > 0 && password.length > 0 && name.length > 0;
   }
-  function tempSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
-    if (email === "123@gmail.com") {
-      setCheck(true);
-      setTimeout(function () {
-        window.location.href = "http://localhost:3000/login";
-      }, 2000);
-      // history.push("/login");
-    } else {
-      alert("註冊失敗");
-    }
+    axios
+      .post("http://localhost:3300/users", { email, name, password }, { withCredentials: true })
+      .then((res) => {
+        if (res.status === 201) {
+          setCheck(true)
+          setTimeout(function () {
+            history.push("/login")
+          }, 2000);
+        } else alert("註冊失敗");
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 400) {
+          alert("信箱已註冊!");
+        }
+        console.log(err)
+      });
   }
   return (
     <Background>
@@ -63,7 +71,7 @@ export default function Register() {
         <Alert variant="success" show={check}>
           成功註冊，將於2秒後回到登入頁面
         </Alert>
-        <Form onSubmit={tempSubmit}>
+        <Form onSubmit={handleSubmit}>
           <Form.Group size="lg" controlId="email">
             <Form.Label>帳號</Form.Label>
             <Form.Control
@@ -82,6 +90,26 @@ export default function Register() {
               }}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group size="lg" controlId="password">
+            <Form.Label>玩家暱稱</Form.Label>
+            <Form.Control
+              type="name"
+              autoComplete="on"
+              style={{
+                outline: "none",
+                border: "1px solid rgba(255,255,255,0.2)",
+                background: "transparent",
+                padding: "8px 10px",
+                borderRadius: "10px",
+                color: "black",
+                fontSize: "16px",
+                fontWeight: "600",
+                boxShadow: "inset 0 0 25px rgba(0,0,0,0.2)",
+              }}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </Form.Group>
           <Form.Group size="lg" controlId="password">
@@ -108,7 +136,7 @@ export default function Register() {
             style={{
               fontWeight: "900",
               width: "5rem",
-              margin: "10px 10px 10px 110px",
+              margin: "10px 10px 10px 50px",
               border: "none",
               borderRadius: "30px",
               color: "#ee786c",
@@ -124,6 +152,29 @@ export default function Register() {
           >
             註冊
           </Button>
+          <Link to="/login" replace>
+            <Button
+              style={{
+                position: "static",
+                fontWeight: "900",
+                border: "none",
+                width: "5rem",
+                margin: "0.5vw",
+                borderRadius: "30px",
+                color: "#ee786c",
+                backgroundColor: "#fff",
+                transition: "all ease .5s",
+                ":hover": {
+                  backgroundColor: "#ee786c",
+                  color: "#ffffff",
+                },
+              }}
+              type="submit"
+            // href="/login"
+            >
+              登入
+            </Button>
+          </Link>
         </Form>
       </RegisterForm>
     </Background>

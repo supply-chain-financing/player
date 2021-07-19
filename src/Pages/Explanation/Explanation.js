@@ -79,7 +79,7 @@ display: inline-block;
   }
 `;
 
-export default function Explanation({}) {
+export default function Explanation({ }) {
   let history = useHistory();
   let btnstyle = {
     position: "static",
@@ -98,6 +98,9 @@ export default function Explanation({}) {
       autoplay: 0,
     },
   };
+  const pushtomatch = () => {
+    history.push("/match")
+  }
 
   return (
     <>
@@ -110,7 +113,7 @@ export default function Explanation({}) {
         <Content>
           <YouTube videoId="XM52n0oaPSM" opts={opts} />
         </Content>
-        <Button variant="outline-secondary" style={btnstyle} href="/match">
+        <Button variant="outline-secondary" style={btnstyle} onClick={pushtomatch}>
           {" "}
           下一步
         </Button>

@@ -6,7 +6,9 @@ import Button from "react-bootstrap/Button";
 
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
-
+import { useDispatch } from "react-redux";
+import { refreshToken, setAccessToken } from "../../redux/tokenSlice";
+import { storeUser } from "../../redux/userSlice";
 const Background = styled.div`
   background-color: #b9d8da;
   box-sizing: border-box;
@@ -37,35 +39,33 @@ const LoginForm = styled.div`
 `;
 
 export default function Login() {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(refreshToken())
+  }, [dispatch])
   const [classNum, setClassNum] = useState("");
-  const [classPassword, setclassPassword] = useState("");
+  const [classroomPassword, setclassroomPassword] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   let history = useHistory();
   function validateForm() {
     return email.length > 0 && password.length > 0;
   }
-  function tempSubmit(e) {
-    e.preventDefault();
-    if (classNum === "123") {
-      history.push("/chooserole");
-    } else {
-      alert("嘿嘿");
-    }
-  }
   function handleSubmit(event) {
     event.preventDefault();
+    console.log(classNum, classroomPassword, email, password)
     axios
       .post(
-        "",
-        { classNum, classPassword, email, password },
+        "http://localhost:3300/users/login",
+        { classNum, classroomPassword, email, password },
         { withCredentials: true }
       )
-      .then(async (res) => {
+      .then(res => {
         if (res.status === 200) {
-          // setAccessToken(res.data.accessToken);
-          // userlogin();
-          // history.push("/dashboard");
+          dispatch(setAccessToken(res.data.accessToken));
+          console.log(res.data.user)
+          dispatch(storeUser(res.data.user))
+          history.push("/chooserole");
         } else {
           alert("回傳錯誤");
         }
@@ -82,7 +82,7 @@ export default function Login() {
   return (
     <Background>
       <LoginForm>
-        <Form onSubmit={tempSubmit}>
+        <Form onSubmit={handleSubmit}>
           <Form.Group size="lg" controlId="classNum">
             <Form.Label>教室</Form.Label>
             <Form.Control
@@ -104,10 +104,10 @@ export default function Login() {
               onChange={(e) => setClassNum(e.target.value)}
             />
           </Form.Group>
-          <Form.Group size="lg" controlId="classPassword">
+          <Form.Group size="lg" controlId="classroomPassword">
             <Form.Label>教室密碼</Form.Label>
             <Form.Control
-              type="classPassword"
+              type="classroomPassword"
               autoComplete="on"
               style={{
                 outline: "none",
@@ -120,8 +120,8 @@ export default function Login() {
                 fontWeight: "600",
                 boxShadow: "inset 0 0 25px rgba(0,0,0,0.2)",
               }}
-              value={classPassword}
-              onChange={(e) => setclassPassword(e.target.value)}
+              value={classroomPassword}
+              onChange={(e) => setclassroomPassword(e.target.value)}
             />
           </Form.Group>
           <Form.Group size="lg" controlId="email">
@@ -184,27 +184,28 @@ export default function Login() {
           >
             登入
           </Button>
-          <Button
-            style={{
-              position: "static",
-              fontWeight: "900",
-              border: "none",
-              width: "5rem",
-              margin: "0.5vw",
-              borderRadius: "30px",
-              color: "#ee786c",
-              backgroundColor: "#fff",
-              transition: "all ease .5s",
-              ":hover": {
-                backgroundColor: "#ee786c",
-                color: "#ffffff",
-              },
-            }}
-            type="submit"
-            href="/register"
-          >
-            註冊
-          </Button>
+          <Link to="/register" replace>
+            <Button
+              style={{
+                position: "static",
+                fontWeight: "900",
+                border: "none",
+                width: "5rem",
+                margin: "0.5vw",
+                borderRadius: "30px",
+                color: "#ee786c",
+                backgroundColor: "#fff",
+                transition: "all ease .5s",
+                ":hover": {
+                  backgroundColor: "#ee786c",
+                  color: "#ffffff",
+                },
+              }}
+              type="submit"
+            >
+              註冊
+            </Button>
+          </Link>
         </Form>
       </LoginForm>
     </Background>

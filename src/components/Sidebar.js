@@ -17,10 +17,14 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { NavLink, useHistory, Switch, Route, Redirect } from "react-router-dom";
 import routes from "../routes_retailer";
-
+import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { setAccessToken, userlogout } from "../redux/tokenSlice";
+import { refreshAuthLogic } from "../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -111,6 +115,16 @@ const switchRoutes = (
 );
 
 export default function Sidebar(props) {
+  const dispatch = useDispatch()
+  const { accessToken } = useSelector(state => state.accessToken)
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  //auto handle request when accessToken was expired
+  createAuthRefreshInterceptor(instance, refreshAuthLogic);
   let history = useHistory();
   const { color, logo, image, logoText, routes } = props;
   const classes = useStyles();
@@ -141,6 +155,18 @@ export default function Sidebar(props) {
     // alert(window.location.pathname);
     return window.location.pathname;
   };
+  const logout = async () => {
+    instance
+      .post("http://localhost:3300/users/logout",
+    )
+      .then(res => {
+        // dispatch(setAccessToken(""))
+        dispatch(userlogout())
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   return (
     <div className={classes.root}>
@@ -165,10 +191,12 @@ export default function Sidebar(props) {
           </IconButton>
           <Typography variant="h6" noWrap>
             Supply-chain
+
             {/* 放Naver */}
           </Typography>
           <Box flexGrow={1} />
           <Hidden mdDown>
+            <ExitToAppIcon onClick={logout} />
             <IconButton color="inherit">
               <Badge
                 badgeContent={notifications.length}

@@ -6,6 +6,7 @@ import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 import Radium from "radium";
 
+
 const Background = styled.div`
   background-color: #b9d8da;
   box-sizing: border-box;
@@ -65,6 +66,10 @@ const StartBtn = styled.div`
 `;
 
 export default function Start() {
+  let history = useHistory();
+  const pushtologin = () => {
+    history.push("/login")
+  }
   return (
     <Background>
       <Logo>
@@ -95,7 +100,8 @@ export default function Start() {
               color: "#ffffff",
             },
           }}
-          href="/login"
+          onClick={pushtologin}
+          // href="/login"
           variant="outline-light"
         >
           Start
