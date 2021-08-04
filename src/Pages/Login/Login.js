@@ -7,7 +7,7 @@ import Button from "react-bootstrap/Button";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
-import { refreshToken, setAccessToken } from "../../redux/tokenSlice";
+import { refreshToken, setAccessToken, userlogout } from "../../redux/tokenSlice";
 import { storeUser } from "../../redux/userSlice";
 const Background = styled.div`
   background-color: #b9d8da;
@@ -39,21 +39,22 @@ const LoginForm = styled.div`
 `;
 
 export default function Login() {
+  const history = useHistory()
   const dispatch = useDispatch()
   useEffect(() => {
+    // dispatch(userlogout())
     dispatch(refreshToken())
   }, [dispatch])
-  const [classNum, setClassNum] = useState("");
-  const [classroomPassword, setclassroomPassword] = useState("");
+  const [classNum, setClassNum] = useState("")
+  const [classroomPassword, setclassroomPassword] = useState("")
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  let history = useHistory();
+  const [password, setPassword] = useState("")
+
   function validateForm() {
     return email.length > 0 && password.length > 0;
   }
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(classNum, classroomPassword, email, password)
     axios
       .post(
         "http://localhost:3300/users/login",
@@ -63,7 +64,6 @@ export default function Login() {
       .then(res => {
         if (res.status === 200) {
           dispatch(setAccessToken(res.data.accessToken));
-          console.log(res.data.user)
           dispatch(storeUser(res.data.user))
           history.push("/chooserole");
         } else {

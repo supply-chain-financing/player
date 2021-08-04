@@ -8,6 +8,7 @@ import store from "./redux/store"
 import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
 import { persistStore } from 'reduxjs-toolkit-persist'
 let persistor = persistStore(store)
+// force to clear all state
 // persistor.purge()
 ReactDOM.render(
   <React.StrictMode>

@@ -6,6 +6,8 @@ import storage from 'reduxjs-toolkit-persist/lib/storage'
 import autoMergeLevel1 from 'reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1';
 import accessTokenReducer from "./tokenSlice"
 import userReducer from "./userSlice"
+import gameReducer from "./gameSlice"
+import invoiceReducer from "./invoiceSlice"
 // import { persistCombineReducers } from 'reduxjs-toolkit-persist';
 const persistConfig = {
     key: 'root',
@@ -15,7 +17,9 @@ const persistConfig = {
 }
 const reducers = combineReducers({
     accessToken: accessTokenReducer,
-    user: userReducer
+    user: userReducer,
+    game: gameReducer,
+    invoice: invoiceReducer
 })
 
 

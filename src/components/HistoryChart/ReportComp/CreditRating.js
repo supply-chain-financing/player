@@ -26,8 +26,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function CreditRating() {
-  const [level, setLevel] = useState("優");
+export default function CreditRating({ creditRating }) {
+  //const [level, setLevel] = useState(creditRating);
   const [lastLevel, setLastLevel] = useState("中");
   const classes = useStyles();
   const theme = useTheme();
@@ -40,14 +40,14 @@ export default function CreditRating() {
           </Typography>
         </Grid>
         <Grid item>
-          <Avatar className={classes.avatar}>{level}</Avatar>
+          <Avatar className={classes.avatar}>{creditRating}</Avatar>
         </Grid>
       </Grid>
       <Box
         mt={2}
         display="flex"
         alignItems="center"
-        // style={{ border: "2px solid black" }}
+      // style={{ border: "2px solid black" }}
       >
         <Typography
           style={{ paddingRight: "2px" }}

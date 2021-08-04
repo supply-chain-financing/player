@@ -27,8 +27,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Liability() {
-  const [liability, setliability] = useState(90);
+export default function Liability({ liability }) {
+  // const [liability, setliability] = useState(liability);
   const [lastLiability, setLastLiability] = useState(30);
   const classes = useStyles();
   const theme = useTheme();
@@ -53,7 +53,7 @@ export default function Liability() {
         mt={2}
         display="flex"
         alignItems="center"
-        // style={{ border: "2px solid black" }}
+      // style={{ border: "2px solid black" }}
       >
         <Typography
           style={{ paddingRight: "2px" }}

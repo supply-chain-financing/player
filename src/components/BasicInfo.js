@@ -21,6 +21,10 @@ import InputBase from "@material-ui/core/InputBase";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import { useSelector, useDispatch } from "react-redux";
+import { setIndustry } from "../redux/userSlice";
+import { RefreshAuthLogic } from "../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 
 const Word = styled.div`
   position: static;
@@ -104,13 +108,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BasicInfo({}) {
+export default function BasicInfo({ }) {
+  //dispatch data from redux
+  const { user: { industryId, role } } = useSelector(state => state.user)
+  const dispatch = useDispatch()
+  const { accessToken } = useSelector(state => state.accessToken)
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic);
   const classes = useStyles();
   const [companyName, setCompanyName] = useState("");
-  const [industry, setIndustry] = useState("");
+  // const [industry, setIndustry] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const handleChange = (event) => {
-    setIndustry(event.target.value);
+    dispatch(setIndustry(parseInt(event.target.value)));
   };
   const handleFocus = () => {
     setIsFocused(true);
@@ -127,22 +144,21 @@ export default function BasicInfo({}) {
 
   function tempSubmit(e) {
     e.preventDefault();
-    // axios
-    //   .post("", {
-    //     values: [value1, value2, value3],
-    //   })
-    //   .then((res) => {
-    //     if (res.data) {
-    //     } else alert("回傳錯誤");
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    alert(companyName);
-    history.push("/explanation");
+    instance
+      .patch("http://localhost:3300/users/me", { role, industryId }
+      )
+      .then(res => {
+        console.log(res.data)
+        history.push("/explanation");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // alert(companyName);
+
   }
   function validateForm() {
-    return companyName != "" && industry != "";
+    return companyName != "" && industryId > 0;
   }
   return (
     <>
@@ -180,7 +196,7 @@ export default function BasicInfo({}) {
               </InputLabel>
               <NativeSelect
                 id="demo-customized-select-native"
-                value={industry}
+                value={industryId}
                 onChange={handleChange}
                 input={<BootstrapInput />}
                 onFocus={handleFocus}

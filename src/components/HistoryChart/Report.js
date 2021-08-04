@@ -14,6 +14,11 @@ import {
   Select,
 } from "@material-ui/core";
 import styled from "styled-components";
+import { useSelector, useDispatch } from "react-redux";
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import axios from "axios";
+import { setFlow } from "../../redux/userSlice";
 
 //import components
 import CreditRating from "./ReportComp/CreditRating";
@@ -25,6 +30,7 @@ import LastCash from "./ReportComp/LastCash";
 import LastInventory from "./ReportComp/LastInventory";
 import LastLiability from "./ReportComp/LastLiability";
 import { Switch } from "react-router";
+
 
 const Block = styled.div`
   position: static;
@@ -100,6 +106,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Report() {
+  const { accessToken } = useSelector(state => state.accessToken)
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
+  const dispatch = useDispatch()
+  const { user: { flow } } = useSelector(state => state.user)
   const [report, setReport] = useState("");
   const [open, setOpen] = useState(false);
   const classes = useStyles();
@@ -127,31 +146,39 @@ export default function Report() {
         return <LastRating />;
     }
   }
-  // useEffect(() => {
-  //   renderSwitch(report);
-  // }, [report]);
+  useEffect(() => {
+    instance
+      .get("http://localhost:3300/flows/me",
+    )
+      .then(res => {
+        dispatch(setFlow(res.data.flow))
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }, [])
 
   return (
     <>
       <Block>
         <Card className={classes.root}>
           <CardContent>
-            <CreditRating />
+            <CreditRating creditRating={flow.creditRating} />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Cash />
+            <Cash cash={flow.cash} />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Inventory />
+            <Inventory inventory={flow.inventory} />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Liability />
+            <Liability liability={flow.liability} />
           </CardContent>
         </Card>
       </Block>

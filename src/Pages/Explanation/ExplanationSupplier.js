@@ -56,7 +56,7 @@ const Block = styled.div`
   color: black;
 `;
 
-export default function ExplanationSupplier({}) {
+export default function ExplanationSupplier({ }) {
   let history = useHistory();
   let btnstyle = {
     position: "static",
@@ -75,7 +75,9 @@ export default function ExplanationSupplier({}) {
       autoplay: 0,
     },
   };
-
+  const pushtomatchsupplier = () => {
+    history.push("/matchsupplier")
+  }
   return (
     <>
       <Block>
@@ -90,7 +92,7 @@ export default function ExplanationSupplier({}) {
         <Button
           variant="outline-secondary"
           style={btnstyle}
-          href="/matchsupplier"
+          onClick={pushtomatchsupplier}
         >
           {" "}
           下一步

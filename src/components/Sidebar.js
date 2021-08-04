@@ -22,8 +22,8 @@ import { NavLink, useHistory, Switch, Route, Redirect } from "react-router-dom";
 import routes from "../routes_retailer";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { setAccessToken, userlogout } from "../redux/tokenSlice";
-import { refreshAuthLogic } from "../refreshAuthLogic";
+import { userlogout } from "../redux/tokenSlice";
+import { RefreshAuthLogic } from "../refreshAuthLogic";
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -123,7 +123,9 @@ export default function Sidebar(props) {
       Authorization: `Bearer ${accessToken}`
     }
   })
+
   //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic()
   createAuthRefreshInterceptor(instance, refreshAuthLogic);
   let history = useHistory();
   const { color, logo, image, logoText, routes } = props;

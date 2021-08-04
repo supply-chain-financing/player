@@ -6,6 +6,9 @@ import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 import { makeStyles } from "@material-ui/core/styles";
 import SendIcon from "@material-ui/icons/Send";
+import { useSelector, useDispatch } from "react-redux";
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 const Block = styled.div`
   position: static;
   padding: 30px;
@@ -77,34 +80,41 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function DeliveryPayment() {
+  const { accessToken } = useSelector(state => state.accessToken)
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
+  const { invoice } = useSelector(state => state.invoice)
   const [day, setDay] = useState("6/28");
   const [creditLine, setCreditLine] = useState("7/28");
   const [money, setMoney] = useState(0);
   const [check, setCheck] = useState(false);
   const classes = useStyles();
-
+  const { pair: { supplierId, createdAt } } = useSelector(state => state.game)
   //click 還款 axios
   function handleClick() {
-    if (check === false) {
-      setCheck(true);
-    } else {
-      setCheck(false);
-    }
-    // api
-    // axios
-    //   .post("")
-    //   .then(async (res) => {
-    //     if (res.status === 200) {
-    //       if (check === false) {
-    //         setCheck(true);
-    //       } else {
-    //         setCheck(false);
-    //       }
-    //     } else {
-    //       alert("error");
-    //     }
-    //   })
-    //   .catch((err) => {});
+    // if (check === false) {
+    //   setCheck(true);
+    // } else {
+    //   setCheck(false);
+    // }
+    instance
+      .patch("http://localhost:3300/flows/cash", { cash: invoice.payable, supplierId, pairCreatedAt: createdAt }
+      )
+      .then(res => {
+        alert("還款成功!")
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+
   }
   return (
     <>
@@ -112,15 +122,15 @@ export default function DeliveryPayment() {
         <Word>繳交貨款</Word>
         <Content>
           <ContentWord>繳交日期</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{day}</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>{invoice.paymentDate}</ContentWord>
         </Content>
         <Content>
-          <ContentWord>Credit line</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{creditLine}</ContentWord>
+          <ContentWord>Credit Term</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>{invoice.creditTerms}</ContentWord>
         </Content>
         <Content>
           <ContentWord>須繳金額</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>{invoice.payable}</ContentWord>
         </Content>
         <Content style={{ width: "40vw", height: "70px", marginLeft: "9%" }}>
           <Alert variant="success" show={check}>

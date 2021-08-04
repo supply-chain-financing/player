@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import React from "react";
+import React, { useEffect } from "react";
 import Start from "./Pages/Start";
 import Login from "./Pages/Login";
 import ChooseRole from "./Pages/ChooseRole";
@@ -17,13 +17,14 @@ import BargainFirstRetailer from "./Pages/BargainFirst/BargainFirstRetailer";
 import BargainFirstSupplier from "./Pages/BargainFirst/BargainSupplier";
 import SupplierAdmin from "./layouts/SupplierAdmin";
 import RetailerAdmin from "./layouts/RetailerAdmin";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
+
 function App() {
   const { accessToken } = useSelector(state => state.accessToken)
   const ProtectedRoute = ({ component: Component, ...rest }) => {

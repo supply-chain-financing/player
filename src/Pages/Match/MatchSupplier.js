@@ -4,6 +4,12 @@ import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
+import { io } from "socket.io-client";
+import { useSelector, useDispatch } from "react-redux";
+import { setPair } from "../../redux/gameSlice";
+import { setPaired, setFlow } from "../../redux/userSlice";
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 //loader
 import { css } from "@emotion/react";
 import SyncLoader from "react-spinners/SyncLoader";
@@ -66,7 +72,7 @@ const Block = styled.div`
   color: black;
 `;
 
-export default function MatchSupplier({}) {
+export default function MatchSupplier({ }) {
   let [matchStatus, setMatchStatus] = useState(false);
   let [matchText, setMatchText] = useState(
     matchStatus ? "匹配完成" : "匹配中..."
@@ -81,18 +87,68 @@ export default function MatchSupplier({}) {
     fontWeight: "400",
     borderRadius: "10px",
   };
-  setTimeout(function () {
-    setLoading(false);
-    setMatchStatus(true);
-  }, 3000);
+  const [socket, setSocket] = useState()
+  const { user: { paired, role, userId, classroomId } } = useSelector(state => state.user)
+  const { accessToken } = useSelector(state => state.accessToken)
+  const { pair: { pairId } } = useSelector(state => state.game)
+  const dispatch = useDispatch()
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
+
+  useEffect(() => {
+    const s = io("http://localhost:3300")
+    setSocket(s)
+    console.log(s)
+    if (!pairId) {
+      s.emit("match", userId, role, classroomId)
+      s.once("match-success", (pair) => {
+        dispatch(setPaired(pair.retailerId))
+        dispatch(setPair(pair))
+        setLoading(false)
+        setMatchStatus(true)
+      })
+    } else {
+      setLoading(false)
+      setMatchStatus(true)
+    }
+    return () => {
+      s.disconnect()
+    }
+  }, [])
+
+  // setTimeout(function () {
+  //   setLoading(false);
+  //   setMatchStatus(true);
+  // }, 3000);
 
   useEffect(() => {
     renderSwitch(loading);
   }, [loading, matchStatus]);
 
   // handle 下一步 Btn
-  function handleClick() {
-    history.push("/bargainfirstsupplier");
+  const handleClick = async () => {
+    instance
+      .post("http://localhost:3300/flows", {
+        userId: userId,
+        creditRating: "低",
+        cash: 100000,
+        inventory: 100,
+        liability: 0
+      })
+      .then(res => {
+        dispatch(setFlow(res.data.flow))
+        history.push("/bargainfirstsupplier")
+      })
+      .catch((err) => {
+        console.log(err)
+      });
   }
 
   //如果有match成功 則換成Tick畫面

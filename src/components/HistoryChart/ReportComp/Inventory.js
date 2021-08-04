@@ -27,11 +27,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Inventory() {
-  const [Inventory, setInventory] = useState(30);
-  const [lastInventory, setLastInventory] = useState(60);
-  const classes = useStyles();
-  const theme = useTheme();
+export default function Inventory({ inventory }) {
+  //const [Inventory, setInventory] = useState(inventory)
+  const [lastInventory, setLastInventory] = useState(60)
+  const classes = useStyles()
+  const theme = useTheme()
   return (
     <>
       <Grid container justify="space-between" spacing={3}>
@@ -40,7 +40,7 @@ export default function Inventory() {
             持有存貨
           </Typography>
           <Typography color="textPrimary" variant="h6">
-            {Inventory}
+            {inventory}
           </Typography>
         </Grid>
         <Grid item>
@@ -53,7 +53,7 @@ export default function Inventory() {
         mt={2}
         display="flex"
         alignItems="center"
-        // style={{ border: "2px solid black" }}
+      // style={{ border: "2px solid black" }}
       >
         <Typography
           style={{ paddingRight: "2px" }}

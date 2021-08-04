@@ -5,12 +5,14 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 
+import { useSelector, useDispatch } from "react-redux";
+import { setRole } from "../../redux/userSlice";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 
 import supplier from "../../assets/role.png";
 import retailer from "../../assets/role.png";
-
+import webSocket from 'socket.io-client'
 import Modal from "react-bootstrap/Modal";
 
 const ModalPlace = styled.div`
@@ -19,7 +21,6 @@ const ModalPlace = styled.div`
 `;
 const Background = styled.div`
   background-color: #b9d8da;
-  box-sizing: border-box;
   position: absolute;
   padding: 0em;
   width: 100%;
@@ -91,7 +92,10 @@ const RetailerBlock = styled.div`
 `;
 
 export default function ChooseRole() {
-  const [role, setRole] = useState("");
+  // const [role, setRole] = useState("");
+  //dispatch data from redux
+  const { user: { role } } = useSelector(state => state.user)
+  const dispatch = useDispatch()
   const [showModal, setShowModal] = useState(false);
 
   const [show, setShow] = useState(false);
@@ -106,8 +110,9 @@ export default function ChooseRole() {
 
   //選擇角色開啟modal
   function tempSubmit(e) {
-    setRole(e.target.value);
+    dispatch(setRole(e.target.value));
     toggleTrueFalse();
+
   }
   function handleChoice() {
     // axios

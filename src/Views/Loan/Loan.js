@@ -3,8 +3,13 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Alert from "react-bootstrap/Alert";
 import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
+import Form from "react-bootstrap/Form";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import SendIcon from "@material-ui/icons/Send";
+import { useSelector, useDispatch } from "react-redux";
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import InputBase from "@material-ui/core/InputBase";
 const Block = styled.div`
   position: static;
   padding: 30px;
@@ -66,7 +71,32 @@ const ContentFooter = styled.div`
   //border: 2px solid black;
   color: black;
 `;
-
+const BootstrapInput = withStyles((theme) => ({
+  root: {
+    "label + &": {
+      marginTop: theme.spacing(2),
+      fontFamily: "jf",
+    },
+  },
+  input: {
+    borderRadius: 10,
+    position: "relative",
+    backgroundColor: theme.palette.background.paper,
+    border: "1px solid #adceed",
+    fontFamily: "jf",
+    fontSize: 16,
+    padding: "10px 26px 10px 12px",
+    transition: theme.transitions.create(["border-color", "box-shadow"]),
+    // Use the system font instead of the default Roboto font.
+    fontFamily: ["jf"].join(","),
+    "&:focus": {
+      borderRadius: 4,
+      borderColor: "#f29979",
+      boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)",
+      fontFamily: "jf",
+    },
+  },
+}))(InputBase);
 const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
@@ -76,11 +106,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function Loan() {
-  const [money, setMoney] = useState(0);
-  const [check, setCheck] = useState(false);
-  const [level, setlevel] = useState("優");
-  const [loanMoney, setLoanMoney] = useState(100);
+  const { accessToken } = useSelector(state => state.accessToken)
+  const dispatch = useDispatch()
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
+  const { user } = useSelector(state => state.user)
+  const [money, setMoney] = useState(0)
+  const [check, setCheck] = useState(false)
+  const [level, setlevel] = useState(user.flow.creditRating)
+  const [loanMoney, setLoanMoney] = useState();
+  const [loanMessage, setloanMessage] = useState();
   const classes = useStyles();
+
   //問題字體格式
   let style = {
     position: "static",
@@ -95,36 +140,44 @@ export default function Loan() {
     marginTop: "10%",
     fontWeight: "400",
   };
+  function validateForm() {
+    return money != "" && money != "0";
+  }
+  //clear loanagreement
+  function handleClear() {
+    setMoney("0")
+    setCheck(false)
+  }
   //click 還款 axios
   function handleClick() {
-    if (check === false) {
-      setCheck(true);
-    } else {
-      setCheck(false);
-    }
-    // api
-    // axios
-    //   .post("")
-    //   .then(async (res) => {
-    //     if (res.status === 200) {
-    //       if (check === false) {
-    //         setCheck(true);
-    //       } else {
-    //         setCheck(false);
-    //       }
-    //     } else {
-    //       alert("error");
-    //     }
-    //   })
-    //   .catch((err) => {});
+    instance
+      .post("http://localhost:3300/loangreement", { facilityAmount: money, borrowerId: user.userId, loanType: 'normal', loanStatus: 'unpaid', effectiveDate: new Date().toISOString().slice(0, 10), maturityDate: new Date(new Date().setMonth(new Date().getMonth() + user.industryId)).toISOString().slice(0, 10) }
+      )
+      .then(res => {
+        setLoanMoney(res.data.loanagreement.facilityAmount)
+        setloanMessage(res.data.message)
+        setCheck(true)
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
+
   return (
     <>
       <Block>
         <Word>借貸契約</Word>
         <Content>
           <ContentWord>申請金額</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>
+            <BootstrapInput
+              id="demo-customized-textbox"
+              value={money}
+              style={{ width: "200px" }}
+              onChange={(e) => setMoney(e.target.value)}
+            />
+          </ContentWord>
+          {/* <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord> */}
         </Content>
         <Content>
           <ContentWord>申請人信用等級</ContentWord>
@@ -132,20 +185,32 @@ export default function Loan() {
         </Content>
         <Content style={{ width: "40vw", height: "70px" }}>
           <Alert variant="success" show={check}>
-            借貸成功！ 批准借貸金額： {loanMoney}
+            {loanMessage}： {loanMoney}
           </Alert>
         </Content>
         <ContentFooter style={{}}>
-          <Button
+          {!check ? <Button
             variant="contained"
             color="primary"
             size="large"
             className={classes.button}
             endIcon={<SendIcon />}
             onClick={handleClick}
+            disabled={!validateForm()}
           >
-            確定
-          </Button>
+            送出借貸
+          </Button> :
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              className={classes.button}
+              endIcon={<SendIcon />}
+              onClick={handleClear}
+            >
+              確定
+            </Button>}
+
         </ContentFooter>
       </Block>
     </>

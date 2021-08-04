@@ -11,7 +11,9 @@ import Modal from "react-bootstrap/Modal";
 import styled from "styled-components";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Form from "react-bootstrap/Form";
-
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import { useSelector, useDispatch } from "react-redux";
 const ModalPlace = styled.div`
   margin-top: 1vh;
   //border: 2px solid black;
@@ -44,16 +46,26 @@ const BootstrapInput = withStyles((theme) => ({
 }))(InputBase);
 
 export default function LoanAgreement() {
-  const [loan, setLoan] = useState([]);
+  const [loans, setLoans] = useState([]);
   const [modalInfo, setModalInfo] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false)
 
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [show, setShow] = useState(false)
+  const handleClose = () => setShow(false)
+  const handleShow = () => setShow(true)
 
-  const [amount, setAmount] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+  const [amount, setAmount] = useState("")
+  const [isFocused, setIsFocused] = useState(false)
+  const { accessToken } = useSelector(state => state.accessToken)
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
 
   const data = [
     {
@@ -103,13 +115,16 @@ export default function LoanAgreement() {
   };
 
   //get loan agreement api
-  const getData = async () => {
-    try {
-      // const data = await axios.get("");
-      // setLoan(data.data);
-    } catch (e) {
-      console.log(e);
-    }
+  const getData = () => {
+    instance
+      .get("http://localhost:3300/loangreement/me",
+    )
+      .then(res => {
+        setLoans(res.data.loanagreements)
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   };
   useEffect(() => {
     getData();
@@ -149,7 +164,7 @@ export default function LoanAgreement() {
     <>
       <BootStrapTable
         keyField="stockId"
-        data={data} //記得換成loan
+        data={loans} //記得換成loan
         columns={columns}
         pagination={paginationFactory()}
         rowEvents={rowEvents}

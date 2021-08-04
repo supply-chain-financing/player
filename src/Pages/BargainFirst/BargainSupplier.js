@@ -13,7 +13,9 @@ import { css } from "@emotion/react";
 
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
-
+import { io } from "socket.io-client";
+import { useSelector, useDispatch } from "react-redux";
+import { setInvoice } from "../../redux/invoiceSlice";
 import Loading from "../../components/Loading";
 
 const Word = styled.div`
@@ -111,47 +113,54 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BargainFirstSupplier({}) {
-  const [money, setMoney] = useState();
-  const [creditTerm, setCreditTerm] = useState(0);
-  const [creditLine, setCreditLine] = useState(0);
-  const [amount, setAmount] = useState(0);
-  const [status, setStatus] = useState("true");
-  const [isFocused, setIsFocused] = useState(false);
-
-  const classes = useStyles();
-  let history = useHistory();
+export default function BargainFirstSupplier({ }) {
+  const [socket, setSocket] = useState()
+  const [money, setMoney] = useState()
+  const [creditTerm, setCreditTerm] = useState(0)
+  //const [creditLine, setCreditLine] = useState(0)
+  const [amount, setAmount] = useState(0)
+  const [status, setStatus] = useState("true")
+  const [isFocused, setIsFocused] = useState(false)
+  const { user: { userId } } = useSelector(state => state.user)
+  const { pair: { pairId } } = useSelector(state => state.game)
+  const { invoice } = useSelector(state => state.invoice)
+  //const [invoice, setInvoice] = useState()
+  const classes = useStyles()
+  const dispatch = useDispatch()
+  let history = useHistory()
 
   const handleFocus = () => {
     setIsFocused(true);
   };
-
+  useEffect(() => {
+    const s = io("http://localhost:3300")
+    setSocket(s)
+    console.log(s)
+    s.emit("join", pairId)
+    return () => {
+      s.disconnect()
+    }
+  }, [])
+  useEffect(() => {
+    if (socket == null) return
+    socket.on("invoice-supplier", (invoice) => {
+      console.log(invoice)
+      setAmount(invoice.amount)
+      dispatch(setInvoice(invoice))
+      setStatus("final")
+    })
+  }, [socket])
   function tempSubmit(e) {
-    e.preventDefault();
-    setStatus("false");
-    // axios
-    //   .post("", {
-    //     values: [value1, value2, value3],
-    //   })
-    //   .then((res) => {
-    //     if (res.data) {
-    //     } else alert("回傳錯誤");
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    // alert(status);
+    e.preventDefault()
+    setStatus("false")
+    socket.emit("sendInvoiceSupplier", { price: money, creditTerm }, pairId)
   }
-  function handleFinal() {
-    setStatus("final");
-  }
-
   function handleIntoAdmin() {
     history.push("/supplieradmin");
   }
 
   function validateForm() {
-    return money != "" && creditLine != "" && creditTerm != "";
+    return money != "" && creditTerm != "";
   }
 
   //從等供應商定價畫面 => 議價表單出來
@@ -164,7 +173,7 @@ export default function BargainFirstSupplier({}) {
             <Word>議價</Word>
             <Form onSubmit={tempSubmit}>
               <Content>
-                <ContentWord>價格</ContentWord>
+                <ContentWord>價格(單價)</ContentWord>
                 <ContentWord style={{ color: "#757ce8" }}>
                   <BootstrapInput
                     id="demo-customized-textbox"
@@ -195,7 +204,7 @@ export default function BargainFirstSupplier({}) {
                   </NativeSelect>
                 </ContentWord>
               </Content>
-              <Content>
+              {/* <Content>
                 <ContentWord>Credit Line</ContentWord>
                 <ContentWord style={{ color: "#757ce8" }}>
                   <NativeSelect
@@ -215,7 +224,7 @@ export default function BargainFirstSupplier({}) {
                     <option value={300}>一百五十萬</option>
                   </NativeSelect>
                 </ContentWord>
-              </Content>
+              </Content> */}
               <ContentFooter style={{}}>
                 <Button
                   variant="contained"
@@ -243,7 +252,6 @@ export default function BargainFirstSupplier({}) {
               size="large"
               className={classes.button}
               endIcon={<SendIcon />}
-              onClick={handleFinal}
             >
               下一步
             </Button>
@@ -263,15 +271,39 @@ export default function BargainFirstSupplier({}) {
                 {creditTerm}
               </ContentWord>
             </Content>
-            <Content>
+            {/* <Content>
               <ContentWord>Credit Line</ContentWord>
               <ContentWord style={{ color: "#757ce8" }}>
                 {creditLine}
               </ContentWord>
+            </Content> */}
+            <Content>
+              <ContentWord>數量</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>{amount}</ContentWord>
             </Content>
             <Content>
-              <ContentWord>Credit Line</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{amount}</ContentWord>
+              <ContentWord>交易日</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.transactionDate}
+              </ContentWord>
+            </Content>
+            <Content>
+              <ContentWord>交貨日</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.deliveryDate}
+              </ContentWord>
+            </Content>
+            <Content>
+              <ContentWord>交貨款日</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.paymentDate}
+              </ContentWord>
+            </Content>
+            <Content>
+              <ContentWord>應付款項</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.payable}
+              </ContentWord>
             </Content>
             <ContentFooter style={{}}>
               <Button

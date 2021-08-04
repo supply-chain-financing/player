@@ -12,6 +12,7 @@ import {
   useTheme,
 } from "@material-ui/core";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
+import { CachedSharp } from "@material-ui/icons";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -27,8 +28,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Cash() {
-  const [money, setMoney] = useState(12345);
+export default function Cash({ cash }) {
+  // const [money, setMoney] = useState(cash)
   const [lastMoney, setLastMoney] = useState(999);
   const classes = useStyles();
   const theme = useTheme();
@@ -40,7 +41,7 @@ export default function Cash() {
             持有現金
           </Typography>
           <Typography color="textPrimary" variant="h6">
-            ${money}
+            ${cash}
           </Typography>
         </Grid>
         <Grid item>
@@ -53,7 +54,7 @@ export default function Cash() {
         mt={2}
         display="flex"
         alignItems="center"
-        // style={{ border: "2px solid black" }}
+      // style={{ border: "2px solid black" }}
       >
         <Typography
           style={{ paddingRight: "2px" }}
