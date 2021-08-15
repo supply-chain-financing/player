@@ -6,13 +6,11 @@ import Repayment from "../Repayment/Repayment";
 import Loan from "../Loan/Loan";
 import Bargain from "../Bargain/Bargain";
 import Investment from "../Investment/Investment";
-
-import Merchandise from "../Merchandise/Merchandise";
-import DeliveryPayment from "../DeliveryPayment/DeliveryPayment";
-import ReceiptDate from "../ReceiptDate/ReceiptDate";
-// sup 的
-import MadeProduct from "../MadeProduct/MadeProduct";
-import Delivery from "../Delivery/Delivery";
+//multi-step
+import MultiStep from "react-multistep";
+//import Process Form
+import ProcessForm from "../ProcessForm/ProcessForm";
+import ProcessFormReatailer from "../ProcessFormRetailer/ProcessFormRetailer";
 // material ui
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -99,11 +97,8 @@ export default function Dashboard() {
               >
                 <Tab label="還款" {...a11yProps(0)} />
                 <Tab label="借貸" {...a11yProps(1)} />
-                <Tab label="議價" {...a11yProps(2)} />
+                <Tab label="議價-收貨-販賣商品-繳交貨款" {...a11yProps(2)} />
                 <Tab label="投資" {...a11yProps(3)} />
-                <Tab label="販賣商品" {...a11yProps(4)} />
-                <Tab label="繳交貨款" {...a11yProps(5)} />
-                <Tab label="收貨" {...a11yProps(6)} />
               </Tabs>
             </AppBar>
             <SwipeableViews
@@ -118,19 +113,10 @@ export default function Dashboard() {
                 <Loan></Loan>
               </TabPanel>
               <TabPanel value={value} index={2} dir={theme.direction}>
-                <Bargain></Bargain>
+                <ProcessFormReatailer />
               </TabPanel>
               <TabPanel value={value} index={3} dir={theme.direction}>
                 <Investment></Investment>
-              </TabPanel>
-              <TabPanel value={value} index={4} dir={theme.direction}>
-                <Merchandise></Merchandise>
-              </TabPanel>
-              <TabPanel value={value} index={5} dir={theme.direction}>
-                <DeliveryPayment></DeliveryPayment>
-              </TabPanel>
-              <TabPanel value={value} index={6} dir={theme.direction}>
-                <ReceiptDate></ReceiptDate>
               </TabPanel>
             </SwipeableViews>
           </div>
@@ -149,10 +135,8 @@ export default function Dashboard() {
               >
                 <Tab label="還款" {...a11yProps(0)} />
                 <Tab label="借貸" {...a11yProps(1)} />
-                <Tab label="議價" {...a11yProps(2)} />
+                <Tab label="議價-融資-製作商品-交貨" {...a11yProps(2)} />
                 <Tab label="投資" {...a11yProps(3)} />
-                <Tab label="製作商品" {...a11yProps(4)} />
-                <Tab label="交貨" {...a11yProps(5)} />
               </Tabs>
             </AppBar>
             <SwipeableViews
@@ -167,16 +151,10 @@ export default function Dashboard() {
                 <Loan></Loan>
               </TabPanel>
               <TabPanel value={value} index={2} dir={theme.direction}>
-                <Bargain></Bargain>
+                <ProcessForm />
               </TabPanel>
               <TabPanel value={value} index={3} dir={theme.direction}>
                 <Investment></Investment>
-              </TabPanel>
-              <TabPanel value={value} index={4} dir={theme.direction}>
-                <MadeProduct></MadeProduct>
-              </TabPanel>
-              <TabPanel value={value} index={5} dir={theme.direction}>
-                <Delivery></Delivery>
               </TabPanel>
             </SwipeableViews>
           </div>

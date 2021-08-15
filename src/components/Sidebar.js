@@ -17,14 +17,16 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { NavLink, useHistory, Switch, Route, Redirect } from "react-router-dom";
 import routes from "../routes_retailer";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { userlogout } from "../redux/tokenSlice";
 import { RefreshAuthLogic } from "../refreshAuthLogic";
-import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import createAuthRefreshInterceptor from "axios-auth-refresh";
+import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
+import AccessAlarmsIcon from "@material-ui/icons/AccessAlarms";
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -115,17 +117,17 @@ const switchRoutes = (
 );
 
 export default function Sidebar(props) {
-  const dispatch = useDispatch()
-  const { accessToken } = useSelector(state => state.accessToken)
+  const dispatch = useDispatch();
+  const { accessToken } = useSelector((state) => state.accessToken);
   const instance = axios.create({
     withCredentials: true,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   //auto handle request when accessToken was expired
-  const refreshAuthLogic = RefreshAuthLogic()
+  const refreshAuthLogic = RefreshAuthLogic();
   createAuthRefreshInterceptor(instance, refreshAuthLogic);
   let history = useHistory();
   const { color, logo, image, logoText, routes } = props;
@@ -159,16 +161,18 @@ export default function Sidebar(props) {
   };
   const logout = async () => {
     instance
-      .post("http://localhost:3300/users/logout",
-    )
-      .then(res => {
+      .post("http://localhost:3300/users/logout")
+      .then((res) => {
         // dispatch(setAccessToken(""))
-        dispatch(userlogout())
+        dispatch(userlogout());
       })
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
+  //加取得現金流api...
+
+  //加取得進度api...
 
   return (
     <div className={classes.root}>
@@ -192,8 +196,13 @@ export default function Sidebar(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Supply-chain
-
+            Supply-chain&nbsp;&nbsp;&nbsp;&nbsp;
+            <MonetizationOnIcon />
+            12,345&nbsp;&nbsp;&nbsp;&nbsp;
+            {/* 現金流放這 */}
+            <AccessAlarmsIcon />
+            2020年9月
+            {/* 遊戲進度 */}
             {/* 放Naver */}
           </Typography>
           <Box flexGrow={1} />

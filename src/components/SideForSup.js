@@ -24,9 +24,17 @@ import ListItemText from "@material-ui/core/ListItemText";
 import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
 import Popover from "@material-ui/core/Popover";
 import InputIcon from "@material-ui/icons/Input";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
+import AccessAlarmsIcon from "@material-ui/icons/AccessAlarms";
 
 import { NavLink, useHistory, Switch, Route, Redirect } from "react-router-dom";
 import routes from "../routes_supplier";
+import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { userlogout } from "../redux/tokenSlice";
+import { RefreshAuthLogic } from "../refreshAuthLogic";
+import createAuthRefreshInterceptor from "axios-auth-refresh";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -113,12 +121,14 @@ const switchRoutes = (
       }
       return null;
     })}
-    <Redirect from="/retaileradmin" to="/retaileradmin/dashboard" />
+    <Redirect from="/supplieradmin" to="/supplieradmin/dashboard" />
   </Switch>
 );
 
 export default function SideForSup(props) {
   let history = useHistory();
+  const dispatch = useDispatch();
+  const { accessToken } = useSelector((state) => state.accessToken);
   const { color, logo, image, logoText, routes } = props;
   const classes = useStyles();
   const theme = useTheme();
@@ -126,6 +136,15 @@ export default function SideForSup(props) {
   const [notifications] = React.useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const popOpen = Boolean(anchorEl);
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic();
+  createAuthRefreshInterceptor(instance, refreshAuthLogic);
 
   const handlePopoverOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -147,6 +166,20 @@ export default function SideForSup(props) {
   const getRoute = () => {
     return window.location.pathname;
   };
+  const logout = async () => {
+    instance
+      .post("http://localhost:3300/users/logout")
+      .then((res) => {
+        // dispatch(setAccessToken(""))
+        dispatch(userlogout());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  //加取得現金流api...
+
+  //加取得進度api...
 
   return (
     <div className={classes.root}>
@@ -170,11 +203,18 @@ export default function SideForSup(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Supply-chain
+            Supply-chain&nbsp;&nbsp;&nbsp;&nbsp;
+            <MonetizationOnIcon />
+            12,345&nbsp;&nbsp;&nbsp;&nbsp;
+            {/* 現金流放這 */}
+            <AccessAlarmsIcon />
+            2020年9月
+            {/* 遊戲進度 */}
             {/* 放Naver */}
           </Typography>
           <Box flexGrow={1} />
           <Hidden mdDown>
+            <ExitToAppIcon onClick={logout} />
             <IconButton color="inherit">
               <Badge
                 badgeContent={notifications.length}

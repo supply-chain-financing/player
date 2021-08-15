@@ -109,12 +109,16 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "42%",
   },
 }));
-export default function MadeProduct() {
+export default function MadeProduct(props) {
   const [check, setCheck] = useState(false);
   const [matchStatus, setMatchStatus] = useState(false);
 
   const classes = useStyles();
 
+  //判斷step
+  if (props.currentStep !== 3) {
+    return null;
+  }
   //click 跳過+axios
   function handleClick() {
     if (matchStatus === false) {

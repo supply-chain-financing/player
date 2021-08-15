@@ -109,12 +109,15 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "42%",
   },
 }));
-export default function Delivery() {
+export default function Delivery(props) {
   const [check, setCheck] = useState(false);
   const [matchStatus, setMatchStatus] = useState(false);
 
   const classes = useStyles();
-
+  //判斷step
+  if (props.currentStep !== 4) {
+    return null;
+  }
   //click 交貨api+axios
   function handleClick() {
     if (matchStatus === false) {

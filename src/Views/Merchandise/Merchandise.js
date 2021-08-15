@@ -109,12 +109,15 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "42%",
   },
 }));
-export default function Merchandise() {
+export default function Merchandise(props) {
   const [check, setCheck] = useState(false);
   const [matchStatus, setMatchStatus] = useState(false);
 
   const classes = useStyles();
-
+  //判斷step
+  if (props.currentStep !== 3) {
+    return null;
+  }
   //問題字體格式
   let style = {
     position: "static",

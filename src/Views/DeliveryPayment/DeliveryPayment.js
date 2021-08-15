@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import SendIcon from "@material-ui/icons/Send";
 import { useSelector, useDispatch } from "react-redux";
 import { RefreshAuthLogic } from "../../refreshAuthLogic";
-import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import createAuthRefreshInterceptor from "axios-auth-refresh";
 const Block = styled.div`
   position: static;
   padding: 30px;
@@ -79,25 +79,31 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "0%",
   },
 }));
-export default function DeliveryPayment() {
-  const { accessToken } = useSelector(state => state.accessToken)
+export default function DeliveryPayment(props) {
+  const { accessToken } = useSelector((state) => state.accessToken);
   //auto handle request when accessToken was expired
   const instance = axios.create({
     withCredentials: true,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
   //auto handle request when accessToken was expired
-  const refreshAuthLogic = RefreshAuthLogic()
-  createAuthRefreshInterceptor(instance, refreshAuthLogic)
-  const { invoice } = useSelector(state => state.invoice)
+  const refreshAuthLogic = RefreshAuthLogic();
+  createAuthRefreshInterceptor(instance, refreshAuthLogic);
+  const { invoice } = useSelector((state) => state.invoice);
   const [day, setDay] = useState("6/28");
   const [creditLine, setCreditLine] = useState("7/28");
   const [money, setMoney] = useState(0);
   const [check, setCheck] = useState(false);
   const classes = useStyles();
-  const { pair: { supplierId, createdAt } } = useSelector(state => state.game)
+  const {
+    pair: { supplierId, createdAt },
+  } = useSelector((state) => state.game);
+  //判斷step
+  if (props.currentStep !== 4) {
+    return null;
+  }
   //click 還款 axios
   function handleClick() {
     // if (check === false) {
@@ -106,15 +112,17 @@ export default function DeliveryPayment() {
     //   setCheck(false);
     // }
     instance
-      .patch("http://localhost:3300/flows/cash", { cash: invoice.payable, supplierId, pairCreatedAt: createdAt }
-      )
-      .then(res => {
-        alert("還款成功!")
+      .patch("http://localhost:3300/flows/cash", {
+        cash: invoice.payable,
+        supplierId,
+        pairCreatedAt: createdAt,
+      })
+      .then((res) => {
+        alert("還款成功!");
       })
       .catch((err) => {
         console.log(err);
-      })
-
+      });
   }
   return (
     <>
@@ -122,15 +130,21 @@ export default function DeliveryPayment() {
         <Word>繳交貨款</Word>
         <Content>
           <ContentWord>繳交日期</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{invoice.paymentDate}</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>
+            {invoice.paymentDate}
+          </ContentWord>
         </Content>
         <Content>
           <ContentWord>Credit Term</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{invoice.creditTerms}</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>
+            {invoice.creditTerms}
+          </ContentWord>
         </Content>
         <Content>
           <ContentWord>須繳金額</ContentWord>
-          <ContentWord style={{ color: "#757ce8" }}>{invoice.payable}</ContentWord>
+          <ContentWord style={{ color: "#757ce8" }}>
+            {invoice.payable}
+          </ContentWord>
         </Content>
         <Content style={{ width: "40vw", height: "70px", marginLeft: "9%" }}>
           <Alert variant="success" show={check}>

@@ -114,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "42%",
   },
 }));
-export default function Bargain(props) {
+export default function FinishPage(props) {
   const [money, setMoney] = useState(0);
   const [creditTerm, setCreditTerm] = useState(0);
   const [creditLine, setCreditLine] = useState(0);
@@ -147,21 +147,8 @@ export default function Bargain(props) {
     alert("數量：" + amount);
   }
 
-  //等待供應商定價
-  setTimeout(function () {
-    // setLoading(false);
-    setMatchStatus(true);
-  }, 1000);
-  // useEffect(() => {
-  //   renderSwitch(matchStatus);
-  // }, [matchStatus]);
-
-  function validateForm() {
-    return amount != "";
-  }
-
   //判斷step
-  if (props.currentStep !== 1) {
+  if (props.currentStep !== 5) {
     return null;
   }
 
@@ -218,7 +205,6 @@ export default function Bargain(props) {
                 className={classes.button}
                 endIcon={<SendIcon />}
                 onClick={tempSubmit}
-                disabled={!validateForm()}
               >
                 送出
               </Button>
@@ -233,7 +219,7 @@ export default function Bargain(props) {
   return (
     <>
       <Block>
-        <Word>{matchStatus ? "議價" : "供應商傳送契約中..."}</Word>
+        <Word>{matchStatus ? "交貨中" : "完成所有流程"}</Word>
         {renderSwitch(matchStatus)}
       </Block>
     </>

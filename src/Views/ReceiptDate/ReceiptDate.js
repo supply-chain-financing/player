@@ -109,11 +109,15 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "42%",
   },
 }));
-export default function ReceiptDate() {
+export default function ReceiptDate(props) {
   const [check, setCheck] = useState(false);
   const [matchStatus, setMatchStatus] = useState(false);
 
   const classes = useStyles();
+  //判斷step
+  if (props.currentStep !== 2) {
+    return null;
+  }
 
   //click 還款 axios
   function handleClick() {

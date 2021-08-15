@@ -4,12 +4,12 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
-import store from "./redux/store"
-import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
-import { persistStore } from 'reduxjs-toolkit-persist'
-let persistor = persistStore(store)
+import store from "./redux/store";
+import { PersistGate } from "reduxjs-toolkit-persist/integration/react";
+import { persistStore } from "reduxjs-toolkit-persist";
+let persistor = persistStore(store);
 // force to clear all state
-// persistor.purge()
+// persistor.purge();
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
