@@ -2,6 +2,10 @@ import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import { useSelector, useDispatch } from "react-redux";
+import { setCash } from "../../redux/userSlice";
 import BootStrapTable from "react-bootstrap-table-next";
 import paginationFactory, {
   PaginationFactory,
@@ -14,6 +18,7 @@ import Form from "react-bootstrap/Form";
 //已投資data
 import InvestData from "../../TempData/InvestData";
 import ScrollMenu from "react-horizontal-scrolling-menu";
+import { CancelPresentationOutlined } from "@material-ui/icons";
 
 const ModalPlace = styled.div`
   margin-top: 1vh;
@@ -85,7 +90,7 @@ const BootstrapInput = withStyles((theme) => ({
 export default function Investment() {
   const classes = useStyles();
   //已投資股票
-  const [investData, setInvestData] = useState(InvestData);
+  const [investData, setInvestData] = useState([]);
   const [stock, setStock] = useState([]);
   const [modalInfo, setModalInfo] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -96,43 +101,43 @@ export default function Investment() {
 
   const [amount, setAmount] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const [sellAmount, setSellAmount] = useState("");
+  const [sellAmount, setSellAmount] = useState(0);
   const [sellBtn, setSellBtn] = useState(false);
   const [sellModalInfo, setSellModalInfo] = useState([]);
   const [sellModalOpen, setSellModalOpen] = useState(false);
   const handleSellClose = () => setSellBtn(false);
-
-  const data = [
-    {
-      stockId: "1",
-      stockName: "大宇資訊",
-      sharePrice: 8.3,
-      expectedReturn: 10.65,
-      riskFactor: 2,
-    },
-    {
-      stockId: "2",
-      stockName: "SM榨乾機",
-      sharePrice: 8.3,
-      expectedReturn: 10.65,
-      riskFactor: 2,
-    },
-    {
-      stockId: "3",
-      stockName: "JPY cody悲慘事業",
-      sharePrice: 8.3,
-      expectedReturn: 10.65,
-      riskFactor: 2,
-    },
-  ];
-
-  const getData = async () => {
-    try {
-      // const data = await axios.get("");
-      // setStock(data);
-    } catch (e) {
-      console.log(e);
+  const dispatch = useDispatch()
+  const { accessToken } = useSelector(state => state.accessToken)
+  const { user: { userId } } = useSelector(state => state.user)
+  const { pair: { currentTime } } = useSelector(state => state.game)
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
     }
+  })
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
+  const getData = async () => {
+    instance
+      .get("http://localhost:3300/stocks",
+    )
+      .then(res => {
+        setStock(res.data.stocks)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    instance
+      .get("http://localhost:3300/investments/me",
+    )
+      .then(res => {
+        setInvestData(res.data.investments)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   };
   useEffect(() => {
     getData();
@@ -141,8 +146,8 @@ export default function Investment() {
   const columns = [
     { dataField: "stockId", text: "代碼" },
     { dataField: "stockName", text: "公司名稱" },
-    { dataField: "sharePrice", text: "買進價格" },
-    { dataField: "expectedReturn", text: "預期收益" },
+    { dataField: "sharePrice", text: "買進價格/股" },
+    { dataField: "expectedReturn", text: "預期收益/股" },
     { dataField: "riskFactor", text: "風險因子" },
   ];
 
@@ -163,19 +168,33 @@ export default function Investment() {
   };
   //送出要賣的股票數量
   function sellSubmit() {
-    // axios
-    //   .post("", {
-    //     values: [value1, value2, value3],
-    //   })
-    //   .then((res) => {
-    //     if (res.data) {
-    //     } else alert("回傳錯誤");
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    alert("要賣出的數量：" + sellAmount + " 張");
-    handleSellClose();
+    instance
+      .patch("http://localhost:3300/investments/me", {
+        investmentId: sellModalInfo.investmentId,
+        sellPrice: sellModalInfo.stock.expectedReturn * sellAmount,
+        lastShareAmount: sellModalInfo.shareAmount - sellAmount,
+        lastAmount: sellModalInfo.investmentAmount - sellModalInfo.stock.expectedReturn * sellAmount
+      })
+      .then(res => {
+        const index = investData.findIndex((element) => element.investmentId === sellModalInfo.investmentId)
+        const data = investData
+        if (sellModalInfo.shareAmount - sellAmount === 0) {
+          data.splice(index, 1)
+          setInvestData(data)
+        } else {
+          data[index].investmentAmount = sellModalInfo.investmentAmount - sellModalInfo.stock.expectedReturn * sellAmount
+          data[index].shareAmount = sellModalInfo.shareAmount - sellAmount
+          setInvestData(data)
+        }
+        dispatch(setCash(parseInt(sellModalInfo.stock.expectedReturn * sellAmount)))
+        alert("成功售出!")
+        handleSellClose()
+      })
+      .catch((err) => {
+        console.log(err)
+        alert("交易失敗")
+        handleSellClose()
+      })
   }
 
   const toggleTrueFalse = () => {
@@ -194,20 +213,41 @@ export default function Investment() {
   };
   //買進 api
   function tempSubmit(e) {
-    e.preventDefault();
-    // axios
-    //   .post("", {
-    //     values: [value1, value2, value3],
-    //   })
-    //   .then((res) => {
-    //     if (res.data) {
-    //     } else alert("回傳錯誤");
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    alert("數量：" + amount);
-    handleClose();
+    e.preventDefault()
+    instance
+      .post("http://localhost:3300/investments", {
+        investorId: userId,
+        stockId: modalInfo.stockId,
+        investmentAmount: modalInfo.sharePrice * amount,
+        shareAmount: amount,
+        investmentDate: currentTime
+      })
+      .then(res => {
+        const index = investData.findIndex((element) => element.investmentId === res.data.investment.investmentId)
+        if (index == -1) {
+          //尚未投資過此公司
+          setInvestData(prevState => [{ investmentId: res.data.investment.investmentId, stock: { stockName: modalInfo.stockName, expectedReturn: modalInfo.expectedReturn }, shareAmount: amount }, ...prevState])
+        } else {
+          //投資過此公司
+          const data = investData
+          //排序方式一：不動
+          data[index] = res.data.investment
+          //排序方式二：買進的排到前面
+          // data.splice(index, 1)
+          // data.unshift(res.data.investment)
+          setInvestData(data)
+          // setInvestData(prevState => [{ ...prevState, res.data.investment }])
+        }
+        dispatch(setCash(-modalInfo.sharePrice * amount))
+        alert("購買成功!")
+        handleClose()
+      })
+      .catch((err) => {
+        console.log(err)
+        alert("購買失敗")
+        handleClose()
+      })
+
   }
   function validateForm() {
     return amount != "";
@@ -286,13 +326,16 @@ export default function Investment() {
           <tr key={i}>
             <Card className={classes.root}>
               <CardContent className={classes.content}>
-                公司名稱：{item.name}
+                investmentId：{item.investmentId}
               </CardContent>
               <CardContent className={classes.content}>
-                買進數量：{item.amount}
+                公司名稱：{item.stock.stockName}
               </CardContent>
               <CardContent className={classes.content}>
-                當前賣出價格：{item.price}
+                買進數量：{item.shareAmount}
+              </CardContent>
+              <CardContent className={classes.content}>
+                當前賣出價格/股：{item.stock.expectedReturn}
               </CardContent>
               <CardContent className={classes.content}>
                 <Button onClick={() => handleSell(item)}>賣出</Button>
@@ -306,7 +349,7 @@ export default function Investment() {
       <Title>投資市場</Title>
       <BootStrapTable
         keyField="stockId"
-        data={data}
+        data={stock}
         columns={columns}
         pagination={paginationFactory()}
         rowEvents={rowEvents}
@@ -326,9 +369,10 @@ export default function Investment() {
             <Modal.Body>
               <Form onSubmit={sellSubmit}>
                 <ul>
-                  <ol>公司代碼：{sellModalInfo.id}</ol>
-                  <ol>目前擁有：{sellModalInfo.amount} 張</ol>
-                  <ol>目前賣出價格：＄{sellModalInfo.price}</ol>
+                  <ol>公司代碼：{sellModalInfo.stockId}</ol>
+                  <ol>目前擁有：{sellModalInfo.shareAmount} 張</ol>
+                  <ol>當前賣出價格/股：＄{sellModalInfo.stock.expectedReturn}</ol>
+                  <ol>目前賣出價格：＄{sellModalInfo.stock.expectedReturn * sellAmount}</ol>
                   <ol>
                     賣出：
                     <NativeSelect
@@ -341,7 +385,7 @@ export default function Investment() {
                         borderBottomColor: isFocused ? "#f29979" : "#f29979",
                         width: "200px",
                       }}
-                    >
+                    >股
                       <option aria-label="選擇數量" value="" />
 
                       <option value={1}>1 </option>

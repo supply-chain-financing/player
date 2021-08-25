@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import {
   makeStyles,
@@ -33,6 +33,7 @@ import routes from "../routes_supplier";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { userlogout } from "../redux/tokenSlice";
+import { setFlow } from "../redux/userSlice";
 import { RefreshAuthLogic } from "../refreshAuthLogic";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 
@@ -126,15 +127,17 @@ const switchRoutes = (
 );
 
 export default function SideForSup(props) {
-  let history = useHistory();
-  const dispatch = useDispatch();
-  const { accessToken } = useSelector((state) => state.accessToken);
+  let history = useHistory()
+  const dispatch = useDispatch()
+  const { accessToken } = useSelector((state) => state.accessToken)
+  const { user: { flow } } = useSelector(state => state.user)
+  const { pair: { currentTime, pairId, supplierId, retailerId } } = useSelector(state => state.game)
   const { color, logo, image, logoText, routes } = props;
-  const classes = useStyles();
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-  const [notifications] = React.useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const classes = useStyles()
+  const theme = useTheme()
+  const [open, setOpen] = useState(false)
+  const [notifications] = useState([])
+  const [anchorEl, setAnchorEl] = useState(null)
   const popOpen = Boolean(anchorEl);
   const instance = axios.create({
     withCredentials: true,
@@ -143,43 +146,64 @@ export default function SideForSup(props) {
     },
   });
   //auto handle request when accessToken was expired
-  const refreshAuthLogic = RefreshAuthLogic();
-  createAuthRefreshInterceptor(instance, refreshAuthLogic);
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
 
   const handlePopoverOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
   const handleDrawerOpen = () => {
     setOpen(true);
-  };
+  }
 
   const handleDrawerClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
   function activeRoute(routeName) {
-    history.push(routeName);
+    history.push(routeName)
   }
   const getRoute = () => {
     return window.location.pathname;
-  };
+  }
   const logout = async () => {
     instance
       .post("http://localhost:3300/users/logout")
       .then((res) => {
         // dispatch(setAccessToken(""))
-        dispatch(userlogout());
+        dispatch(userlogout())
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  //加取得現金流api...
-
-  //加取得進度api...
+  //取得現金流api...&取得進度api...
+  const getData = async () => {
+    instance
+      .get("http://localhost:3300/flows/me",
+    )
+      .then(res => {
+        dispatch(setFlow(res.data.flow))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    // instance
+    //   .get("http://localhost:3300/investments/me",
+    // )
+    //   .then(res => {
+    //     setInvestData(res.data.investments)
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+  };
+  useEffect(() => {
+    getData()
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -205,11 +229,9 @@ export default function SideForSup(props) {
           <Typography variant="h6" noWrap>
             Supply-chain&nbsp;&nbsp;&nbsp;&nbsp;
             <MonetizationOnIcon />
-            12,345&nbsp;&nbsp;&nbsp;&nbsp;
-            {/* 現金流放這 */}
+            &nbsp;{flow.cash}&nbsp;
             <AccessAlarmsIcon />
-            2020年9月
-            {/* 遊戲進度 */}
+            &nbsp;{currentTime}&nbsp;
             {/* 放Naver */}
           </Typography>
           <Box flexGrow={1} />

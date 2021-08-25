@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Badge, Hidden, Box, IconButton } from "@material-ui/core";
+import { useState, useEffect } from "react";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -23,6 +24,7 @@ import routes from "../routes_retailer";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { userlogout } from "../redux/tokenSlice";
+import { setFlow } from "../redux/userSlice";
 import { RefreshAuthLogic } from "../refreshAuthLogic";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
@@ -118,7 +120,9 @@ const switchRoutes = (
 
 export default function Sidebar(props) {
   const dispatch = useDispatch();
-  const { accessToken } = useSelector((state) => state.accessToken);
+  const { accessToken } = useSelector((state) => state.accessToken)
+  const { user: { flow } } = useSelector(state => state.user)
+  const { pair: { currentTime, pairId, supplierId, retailerId } } = useSelector(state => state.game)
   const instance = axios.create({
     withCredentials: true,
     headers: {
@@ -133,9 +137,9 @@ export default function Sidebar(props) {
   const { color, logo, image, logoText, routes } = props;
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-  const [notifications] = React.useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [open, setOpen] = useState(false);
+  const [notifications] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
   const popOpen = Boolean(anchorEl);
 
   const handlePopoverOpen = (event) => {
@@ -170,9 +174,31 @@ export default function Sidebar(props) {
         console.log(err);
       });
   };
-  //加取得現金流api...
+  //取得現金流api...&取得進度api...
+  const getData = async () => {
+    instance
+      .get("http://localhost:3300/flows/me",
+    )
+      .then(res => {
+        dispatch(setFlow(res.data.flow))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    // instance
+    //   .get("http://localhost:3300/investments/me",
+    // )
+    //   .then(res => {
+    //     setInvestData(res.data.investments)
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+  };
+  useEffect(() => {
+    getData()
+  }, []);
 
-  //加取得進度api...
 
   return (
     <div className={classes.root}>
@@ -198,11 +224,9 @@ export default function Sidebar(props) {
           <Typography variant="h6" noWrap>
             Supply-chain&nbsp;&nbsp;&nbsp;&nbsp;
             <MonetizationOnIcon />
-            12,345&nbsp;&nbsp;&nbsp;&nbsp;
-            {/* 現金流放這 */}
+            &nbsp;{flow.cash}&nbsp;
             <AccessAlarmsIcon />
-            2020年9月
-            {/* 遊戲進度 */}
+            &nbsp;{currentTime}&nbsp;
             {/* 放Naver */}
           </Typography>
           <Box flexGrow={1} />

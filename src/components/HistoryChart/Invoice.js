@@ -77,6 +77,7 @@ export default function Invoice() {
     { dataField: "unitPrice", text: "單價" },
     { dataField: "payable", text: "應付款項" },
     { dataField: "creditTerms", text: "信用條件" },
+    { dataField: "invoiceStatus", text: "付款狀態" },
   ];
 
   const rowEvents = {
@@ -127,6 +128,7 @@ export default function Invoice() {
             <ol>單價：{modalInfo.unitPrice}</ol>
             <ol>應付款項：{modalInfo.payable}</ol>
             <ol>信用條件：{modalInfo.creditTerms}</ol>
+            <ol>付款狀態：{modalInfo.invoiceStatus}</ol>
           </ul>
         </Modal.Body>
         <Modal.Footer>

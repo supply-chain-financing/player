@@ -21,8 +21,11 @@ const userSlice = createSlice({
         },
         setFlow: (state, action) => {
             state.user.flow = action.payload
+        },
+        setCash: (state, action) => {
+            state.user.flow.cash = state.user.flow.cash + action.payload
         }
     },
 })
-export const { storeUser, setRole, setIndustry, setPaired, setFlow } = userSlice.actions
+export const { storeUser, setRole, setIndustry, setPaired, setFlow, setCash } = userSlice.actions
 export default userSlice.reducer
