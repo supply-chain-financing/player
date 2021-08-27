@@ -9,6 +9,8 @@ import SendIcon from "@material-ui/icons/Send";
 import { useSelector, useDispatch } from "react-redux";
 import { RefreshAuthLogic } from "../../refreshAuthLogic";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
+import { setDisabled, setMarginTrading } from "../../redux/processSlice";
+import { setCash } from "../../redux/userSlice";
 import InputBase from "@material-ui/core/InputBase";
 const Block = styled.div`
   position: static;
@@ -106,7 +108,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function MarginTrading(props) {
-  const { accessToken } = useSelector((state) => state.accessToken);
+  const { accessToken } = useSelector((state) => state.accessToken)
+  const { pair: { currentTime } } = useSelector(state => state.game)
+  const { marginTrading } = useSelector(state => state.process)
   const dispatch = useDispatch();
   //auto handle request when accessToken was expired
   const instance = axios.create({
@@ -120,7 +124,7 @@ export default function MarginTrading(props) {
   createAuthRefreshInterceptor(instance, refreshAuthLogic);
   const { user } = useSelector((state) => state.user);
   const [money, setMoney] = useState(0);
-  const [check, setCheck] = useState(false);
+  // const [check, setCheck] = useState(false);
   const [level, setlevel] = useState(user.flow.creditRating);
   const [loanMoney, setLoanMoney] = useState();
   const [loanMessage, setloanMessage] = useState();
@@ -147,29 +151,31 @@ export default function MarginTrading(props) {
     return money != "" && money != "0";
   }
   //clear loanagreement
-  function handleClear() {
-    setMoney("0");
-    setCheck(false);
-  }
+
+
+
   //click 還款 axios
   function handleClick() {
     instance
       .post("http://localhost:3300/loangreement", {
         facilityAmount: money,
         borrowerId: user.userId,
-        loanType: "normal",
+        loanType: "financial",
         loanStatus: "unpaid",
-        effectiveDate: new Date().toISOString().slice(0, 10),
+        effectiveDate: currentTime,
         maturityDate: new Date(
-          new Date().setMonth(new Date().getMonth() + user.industryId)
+          new Date().setMonth(new Date().getMonth(currentTime) + user.industryId)
         )
           .toISOString()
           .slice(0, 10),
       })
       .then((res) => {
-        setLoanMoney(res.data.loanagreement.facilityAmount);
-        setloanMessage(res.data.message);
-        setCheck(true);
+        setLoanMoney(res.data.loanagreement.facilityAmount)
+        setloanMessage(res.data.message)
+        dispatch(setMarginTrading(true))
+        dispatch(setDisabled(false))
+        dispatch(setCash(parseInt(res.data.loanagreement.facilityAmount)))
+        setMoney("0")
       })
       .catch((err) => {
         console.log(err);
@@ -197,12 +203,12 @@ export default function MarginTrading(props) {
           <ContentWord style={{ color: "#757ce8" }}>{level}</ContentWord>
         </Content>
         <Content style={{ width: "40vw", height: "70px" }}>
-          <Alert variant="success" show={check}>
+          <Alert variant="success" show={marginTrading}>
             {loanMessage}： {loanMoney}
           </Alert>
         </Content>
         <ContentFooter style={{}}>
-          {!check ? (
+          {!marginTrading ? (
             <Button
               variant="contained"
               color="primary"
@@ -214,18 +220,7 @@ export default function MarginTrading(props) {
             >
               送出借貸
             </Button>
-          ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              className={classes.button}
-              endIcon={<SendIcon />}
-              onClick={handleClear}
-            >
-              確定
-            </Button>
-          )}
+          ) : (null)}
         </ContentFooter>
       </Block>
     </>

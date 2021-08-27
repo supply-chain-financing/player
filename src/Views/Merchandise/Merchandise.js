@@ -14,7 +14,11 @@ import FormControl from "@material-ui/core/FormControl";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
 import InputLabel from "@material-ui/core/InputLabel";
-
+import { setDisabled, setMerchandise } from "../../redux/processSlice";
+import { setCash } from "../../redux/userSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 const gif = "https://media.giphy.com/media/xTiIzMVQg9yakyBV0A/giphy.gif";
 
 const override = css`
@@ -110,10 +114,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function Merchandise(props) {
-  const [check, setCheck] = useState(false);
-  const [matchStatus, setMatchStatus] = useState(false);
-
-  const classes = useStyles();
+  // const [check, setCheck] = useState(false);
+  // const [matchStatus, setMatchStatus] = useState(false);
+  const dispatch = useDispatch()
+  const { merchandise } = useSelector(state => state.process)
+  const classes = useStyles()
+  const { accessToken } = useSelector(state => state.accessToken)
+  const { user: { userId } } = useSelector(state => state.user)
+  //auto handle request when accessToken was expired
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  //auto handle request when accessToken was expired
+  const refreshAuthLogic = RefreshAuthLogic()
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
   //判斷step
   if (props.currentStep !== 3) {
     return null;
@@ -133,14 +150,24 @@ export default function Merchandise(props) {
     fontWeight: "400",
   };
 
-  //click 還款 axios
+  //販賣商品
   function handleClick() {
-    if (matchStatus === false) {
-      setMatchStatus(true);
-      alert("Skip");
-    } else {
-      setMatchStatus(false);
-    }
+    instance
+      .patch("http://localhost:3300/flows/cash", {
+        userId,
+        type: "sellproduct",
+        cash: 3000,
+      })
+      .then((res) => {
+        //要根據供需表決定賣出的商品價格
+        dispatch(setCash(3000))
+        dispatch(setMerchandise(true))
+        dispatch(setDisabled(false))
+        alert("賣出商品!");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     // api
     // axios
     //   .post("")
@@ -184,8 +211,8 @@ export default function Merchandise(props) {
     <>
       <Block>
         <Word>
-          {matchStatus ? "完成販賣!" : "販賣產品中..."}
-          {matchStatus ? (
+          {merchandise ? "完成販賣!" : "販賣產品中..."}
+          {merchandise ? (
             ""
           ) : (
             <Button
@@ -197,12 +224,12 @@ export default function Merchandise(props) {
               endIcon={<SendIcon />}
               onClick={handleClick}
             >
-              Skip
+              完成販賣
             </Button>
           )}
         </Word>
 
-        {renderSwitch(matchStatus)}
+        {renderSwitch(merchandise)}
       </Block>
     </>
   );

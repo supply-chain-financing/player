@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { refreshToken, setAccessToken, userlogout } from "../../redux/tokenSlice";
 import { storeUser } from "../../redux/userSlice";
+
 const Background = styled.div`
   background-color: #b9d8da;
   box-sizing: border-box;
@@ -63,7 +64,7 @@ export default function Login() {
       )
       .then(res => {
         if (res.status === 200) {
-          dispatch(setAccessToken(res.data.accessToken));
+          dispatch(setAccessToken(res.data.accessToken))
           dispatch(storeUser(res.data.user))
           history.push("/chooserole");
         } else {

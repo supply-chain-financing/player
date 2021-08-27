@@ -27,9 +27,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Inventory({ inventory }) {
+export default function Inventory({ inventory, lastInventory }) {
   //const [Inventory, setInventory] = useState(inventory)
-  const [lastInventory, setLastInventory] = useState(60)
+  // const [lastInventory, setLastInventory] = useState(60)
   const classes = useStyles()
   const theme = useTheme()
   return (

@@ -5,7 +5,7 @@ import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 import Radium from "radium";
-
+import { disconnectSocket } from '../../socket';
 
 const Background = styled.div`
   background-color: #b9d8da;
@@ -70,6 +70,10 @@ export default function Start() {
   const pushtologin = () => {
     history.push("/login")
   }
+  useEffect(() => {
+    disconnectSocket()
+  }, [])
+
   return (
     <Background>
       <Logo>

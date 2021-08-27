@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Form from "react-bootstrap/Form";
@@ -12,6 +12,8 @@ import { css } from "@emotion/react";
 
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
+import { useSelector, useDispatch } from "react-redux";
+
 
 const override = css`
   display: block;
@@ -121,7 +123,7 @@ export default function FinishPage(props) {
   const [amount, setAmount] = useState("");
   const [matchStatus, setMatchStatus] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-
+  const { finish } = useSelector(state => state.process)
   const classes = useStyles();
 
   const handleChange = (event) => {
@@ -131,21 +133,11 @@ export default function FinishPage(props) {
     setIsFocused(true);
   };
 
-  function tempSubmit(e) {
-    e.preventDefault();
-    // axios
-    //   .post("", {
-    //     values: [value1, value2, value3],
-    //   })
-    //   .then((res) => {
-    //     if (res.data) {
-    //     } else alert("回傳錯誤");
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    alert("數量：" + amount);
-  }
+  // function tempSubmit(e) {
+  //   e.preventDefault();
+
+  //   alert("數量：" + amount);
+  // }
 
   //判斷step
   if (props.currentStep !== 5) {
@@ -154,73 +146,72 @@ export default function FinishPage(props) {
 
   //從等供應商定價畫面 => 議價表單出來
   //如果有match成功 則換成Tick畫面
-  function renderSwitch(param) {
-    switch (param) {
-      case true:
-        return (
-          <Form onSubmit={tempSubmit}>
-            <Content>
-              <ContentWord>對方價格</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
-            </Content>
-            <Content>
-              <ContentWord>Credit Term</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>
-                {creditTerm}
-              </ContentWord>
-            </Content>
-            <Content>
-              <ContentWord>Credit Line</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>
-                {creditLine}
-              </ContentWord>
-            </Content>
-            <Content>
-              <ContentWord>數量</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>
-                <NativeSelect
-                  id="demo-customized-select-native"
-                  value={amount}
-                  onChange={handleChange}
-                  input={<BootstrapInput />}
-                  onFocus={handleFocus}
-                  style={{
-                    borderBottomColor: isFocused ? "#f29979" : "#f29979",
-                    width: "200px",
-                  }}
-                >
-                  <option aria-label="選擇產業" value="" />
-                  <option value={100}>100 </option>
-                  <option value={200}>200</option>
-                  <option value={300}>300</option>
-                </NativeSelect>
-              </ContentWord>
-            </Content>
+  // function renderSwitch(param) {
+  //   switch (param) {
+  //     case true:
+  //       return (
+  //         <Form onSubmit={tempSubmit}>
+  //           <Content>
+  //             <ContentWord>對方價格</ContentWord>
+  //             <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
+  //           </Content>
+  //           <Content>
+  //             <ContentWord>Credit Term</ContentWord>
+  //             <ContentWord style={{ color: "#757ce8" }}>
+  //               {creditTerm}
+  //             </ContentWord>
+  //           </Content>
+  //           <Content>
+  //             <ContentWord>Credit Line</ContentWord>
+  //             <ContentWord style={{ color: "#757ce8" }}>
+  //               {creditLine}
+  //             </ContentWord>
+  //           </Content>
+  //           <Content>
+  //             <ContentWord>數量</ContentWord>
+  //             <ContentWord style={{ color: "#757ce8" }}>
+  //               <NativeSelect
+  //                 id="demo-customized-select-native"
+  //                 value={amount}
+  //                 onChange={handleChange}
+  //                 input={<BootstrapInput />}
+  //                 onFocus={handleFocus}
+  //                 style={{
+  //                   borderBottomColor: isFocused ? "#f29979" : "#f29979",
+  //                   width: "200px",
+  //                 }}
+  //               >
+  //                 <option aria-label="選擇產業" value="" />
+  //                 <option value={100}>100 </option>
+  //                 <option value={200}>200</option>
+  //                 <option value={300}>300</option>
+  //               </NativeSelect>
+  //             </ContentWord>
+  //           </Content>
 
-            <ContentFooter style={{}}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                className={classes.button}
-                endIcon={<SendIcon />}
-                onClick={tempSubmit}
-              >
-                送出
-              </Button>
-            </ContentFooter>
-          </Form>
-        );
-      default:
-        return <></>;
-    }
-  }
+  //           <ContentFooter style={{}}>
+  //             <Button
+  //               variant="contained"
+  //               color="primary"
+  //               size="large"
+  //               className={classes.button}
+  //               endIcon={<SendIcon />}
+  //               onClick={tempSubmit}
+  //             >
+  //               送出
+  //             </Button>
+  //           </ContentFooter>
+  //         </Form>
+  //       );
+  //     default:
+  //       return <></>;
+  //   }
+  // }
 
   return (
     <>
       <Block>
-        <Word>{matchStatus ? "交貨中" : "完成所有流程"}</Word>
-        {renderSwitch(matchStatus)}
+        <Word>{finish ? "零售商繳交貨款!完成所有流程!" : "零售商正在製作及販售商品"}</Word>
       </Block>
     </>
   );

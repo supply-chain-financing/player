@@ -74,7 +74,7 @@ function App() {
 
         <ProtectedRoute path="/retaileradmin" component={RetailerAdmin} />
         <Redirect from="/retaileradmin" to="/retaileradmin/dashboard" />
-        <ProtectedRoute path="*" exact component={Login} />
+        {/* <ProtectedRoute path="*" exact component={Login} /> */}
       </Switch>
     </Router>
   );

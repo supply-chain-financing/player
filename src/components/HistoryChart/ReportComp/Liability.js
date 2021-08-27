@@ -27,9 +27,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Liability({ liability }) {
+export default function Liability({ liability, lastLiability }) {
   // const [liability, setliability] = useState(liability);
-  const [lastLiability, setLastLiability] = useState(30);
+  // const [lastLiability, setLastLiability] = useState(30);
   const classes = useStyles();
   const theme = useTheme();
   return (

@@ -33,9 +33,15 @@ import routes from "../routes_supplier";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { userlogout } from "../redux/tokenSlice";
-import { setFlow } from "../redux/userSlice";
+import { setCash, setFlow } from "../redux/userSlice";
 import { RefreshAuthLogic } from "../refreshAuthLogic";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
+import {
+  initiateSocket, disconnectSocket, joinroom, isSocket, getSocket
+} from '../socket';
+import { setBargainSupplier } from "../redux/processSlice";
+import { setInvoice, setAmount } from "../redux/invoiceSlice";
+import { setDisabled, setFinish } from "../redux/processSlice";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -130,7 +136,7 @@ export default function SideForSup(props) {
   let history = useHistory()
   const dispatch = useDispatch()
   const { accessToken } = useSelector((state) => state.accessToken)
-  const { user: { flow } } = useSelector(state => state.user)
+  const { user: { userId, industryId, classroomId, flow } } = useSelector(state => state.user)
   const { pair: { currentTime, pairId, supplierId, retailerId } } = useSelector(state => state.game)
   const { color, logo, image, logoText, routes } = props;
   const classes = useStyles()
@@ -174,6 +180,7 @@ export default function SideForSup(props) {
       .post("http://localhost:3300/users/logout")
       .then((res) => {
         // dispatch(setAccessToken(""))
+        disconnectSocket()
         dispatch(userlogout())
       })
       .catch((err) => {
@@ -191,20 +198,35 @@ export default function SideForSup(props) {
       .catch((err) => {
         console.log(err)
       })
-    // instance
-    //   .get("http://localhost:3300/investments/me",
-    // )
-    //   .then(res => {
-    //     setInvestData(res.data.investments)
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
+
   };
   useEffect(() => {
     getData()
+    // if (!isSocket()) {
+    initiateSocket()
+    joinroom(pairId)
+    joinroom("class" + classroomId)
+    // }
   }, []);
-
+  useEffect(() => {
+    if (!getSocket()) return
+    getSocket().on("invoice-supplier", (invoice) => {
+      console.log(invoice)
+      dispatch(setAmount(invoice.amount))
+      dispatch(setInvoice(invoice))
+      dispatch(setBargainSupplier("final"))
+      dispatch(setDisabled(false))
+    })
+    getSocket().on("message", (message) => {
+      console.log(message)
+      if (message.type === "deliveryPayment") {
+        dispatch(setFinish(true))
+        dispatch(setDisabled(false))
+        //this is weird!!!!!乾為什麼
+        dispatch(setCash(parseInt(message.cash)))
+      }
+    })
+  }, [getSocket()])
   return (
     <div className={classes.root}>
       <CssBaseline />

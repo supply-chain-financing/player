@@ -15,6 +15,9 @@ const gameSlice = createSlice({
         setPair: (state, action) => {
             state.pair = action.payload
         },
+        setCurrentTime: (state, action) => {
+            state.pair.currentTime = action.payload
+        },
 
     },
     // extraReducers: {
@@ -32,5 +35,5 @@ const gameSlice = createSlice({
     //     },
     // },
 })
-export const { setMessage, setPair } = gameSlice.actions
+export const { setMessage, setPair, setCurrentTime } = gameSlice.actions
 export default gameSlice.reducer

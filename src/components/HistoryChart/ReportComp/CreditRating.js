@@ -26,9 +26,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function CreditRating({ creditRating }) {
+export default function CreditRating({ creditRating, lastCreditRating }) {
   //const [level, setLevel] = useState(creditRating);
-  const [lastLevel, setLastLevel] = useState("中");
+  // const [lastLevel, setLastLevel] = useState("中");
   const classes = useStyles();
   const theme = useTheme();
   return (
@@ -57,7 +57,7 @@ export default function CreditRating({ creditRating }) {
           上月信用等級
         </Typography>
         <Typography style={{ color: "red" }} variant="caption">
-          {lastLevel}
+          {lastCreditRating}
         </Typography>
       </Box>
     </>

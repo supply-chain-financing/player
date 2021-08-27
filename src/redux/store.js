@@ -8,6 +8,7 @@ import accessTokenReducer from "./tokenSlice"
 import userReducer from "./userSlice"
 import gameReducer from "./gameSlice"
 import invoiceReducer from "./invoiceSlice"
+import processReducer from "./processSlice"
 // import { persistCombineReducers } from 'reduxjs-toolkit-persist';
 const persistConfig = {
     key: 'root',
@@ -19,7 +20,8 @@ const reducers = combineReducers({
     accessToken: accessTokenReducer,
     user: userReducer,
     game: gameReducer,
-    invoice: invoiceReducer
+    invoice: invoiceReducer,
+    process: processReducer
 })
 
 

@@ -21,9 +21,14 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import { io } from "socket.io-client";
-import axios from "axios";
-import { render } from "react-dom";
+// import { io } from "socket.io-client";
+// import { useSelector, useDispatch } from "react-redux";
+// import axios from "axios";
+// import { render } from "react-dom";
+// import {
+//   initiateSocket, disconnectSocket, joinroom,
+//   subscribeToChat, sendMessage, isSocket
+// } from '../../socket';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -69,6 +74,7 @@ export default function Dashboard() {
   const classes = useStyles();
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

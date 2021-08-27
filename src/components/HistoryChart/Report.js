@@ -121,6 +121,8 @@ export default function Report() {
   const { user: { flow } } = useSelector(state => state.user)
   const [report, setReport] = useState("");
   const [open, setOpen] = useState(false);
+  const [records, setRecords] = useState("")
+  const [lastRecord, setLastRecord] = useState("")
   const classes = useStyles();
   const handleChange = (event) => {
     setReport(event.target.value);
@@ -156,6 +158,21 @@ export default function Report() {
       .catch((err) => {
         console.log(err);
       })
+    instance
+      .get("http://localhost:3300/records/me",
+    )
+      .then(res => {
+        setRecords(res.data.records)
+        if (res.data.records) {
+          setLastRecord(res.data.records[0])
+        } else {
+          setLastRecord({ creditRating: "無", cash: "無", inventory: "無", liability: "無" })
+        }
+
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }, [])
 
   return (
@@ -163,22 +180,22 @@ export default function Report() {
       <Block>
         <Card className={classes.root}>
           <CardContent>
-            <CreditRating creditRating={flow.creditRating} />
+            <CreditRating creditRating={flow.creditRating} lastCreditRating={lastRecord.creditRating} />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Cash cash={flow.cash} />
+            <Cash cash={flow.cash} lastCash={lastRecord.cash} />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Inventory inventory={flow.inventory} />
+            <Inventory inventory={flow.inventory} lastInventory={lastRecord.inventory} />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Liability liability={flow.liability} />
+            <Liability liability={flow.liability} lastLiability={lastRecord.liability} />
           </CardContent>
         </Card>
       </Block>

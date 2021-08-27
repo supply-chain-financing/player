@@ -14,7 +14,11 @@ import FormControl from "@material-ui/core/FormControl";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
 import InputLabel from "@material-ui/core/InputLabel";
-
+import { setDisabled, setDelivery } from "../../redux/processSlice";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  initiateSocket, disconnectSocket, joinroom, isSocket, getSocket
+} from '../../socket';
 const gif = "https://media.giphy.com/media/9DgxhWOxHDHtF8bvwl/giphy.gif";
 
 const override = css`
@@ -110,9 +114,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function Delivery(props) {
-  const [check, setCheck] = useState(false);
-  const [matchStatus, setMatchStatus] = useState(false);
-
+  // const [check, setCheck] = useState(false);
+  // const [matchStatus, setMatchStatus] = useState(false);
+  const dispatch = useDispatch()
+  const { pair: { pairId } } = useSelector(state => state.game)
+  const { delivery } = useSelector(state => state.process)
   const classes = useStyles();
   //判斷step
   if (props.currentStep !== 4) {
@@ -120,11 +126,12 @@ export default function Delivery(props) {
   }
   //click 交貨api+axios
   function handleClick() {
-    if (matchStatus === false) {
-      setMatchStatus(true);
+    if (!delivery) {
+      dispatch(setDelivery(true))
+
+      getSocket().emit("sendMessage", "delivery", pairId)
+      dispatch(setDisabled(false))
       alert("交貨中");
-    } else {
-      setMatchStatus(false);
     }
     // api
     // axios
@@ -168,8 +175,8 @@ export default function Delivery(props) {
     <>
       <Block>
         <Word>
-          {matchStatus ? "交貨完成!" : "交貨"}
-          {matchStatus ? (
+          {delivery ? "交貨完成!" : "交貨"}
+          {delivery ? (
             ""
           ) : (
             <Button
@@ -186,7 +193,7 @@ export default function Delivery(props) {
           )}
         </Word>
 
-        {renderSwitch(matchStatus)}
+        {renderSwitch(delivery)}
       </Block>
     </>
   );

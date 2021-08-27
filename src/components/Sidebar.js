@@ -27,6 +27,12 @@ import { userlogout } from "../redux/tokenSlice";
 import { setFlow } from "../redux/userSlice";
 import { RefreshAuthLogic } from "../refreshAuthLogic";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
+import {
+  initiateSocket, disconnectSocket, joinroom, isSocket, getSocket
+} from '../socket';
+import { setInvoice, setCreditTerms, setPayable, setUnitPrice } from "../redux/invoiceSlice";
+import { setDisabled } from "../redux/processSlice";
+import { setBargain, setReceipt } from "../redux/processSlice";
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AccessAlarmsIcon from "@material-ui/icons/AccessAlarms";
 const drawerWidth = 240;
@@ -121,7 +127,7 @@ const switchRoutes = (
 export default function Sidebar(props) {
   const dispatch = useDispatch();
   const { accessToken } = useSelector((state) => state.accessToken)
-  const { user: { flow } } = useSelector(state => state.user)
+  const { user: { userId, industryId, classroomId, flow } } = useSelector(state => state.user)
   const { pair: { currentTime, pairId, supplierId, retailerId } } = useSelector(state => state.game)
   const instance = axios.create({
     withCredentials: true,
@@ -168,7 +174,8 @@ export default function Sidebar(props) {
       .post("http://localhost:3300/users/logout")
       .then((res) => {
         // dispatch(setAccessToken(""))
-        dispatch(userlogout());
+        dispatch(userlogout())
+        disconnectSocket()
       })
       .catch((err) => {
         console.log(err);
@@ -185,19 +192,36 @@ export default function Sidebar(props) {
       .catch((err) => {
         console.log(err)
       })
-    // instance
-    //   .get("http://localhost:3300/investments/me",
-    // )
-    //   .then(res => {
-    //     setInvestData(res.data.investments)
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
   };
   useEffect(() => {
     getData()
-  }, []);
+    // if (!isSocket()) {
+    initiateSocket()
+    joinroom(pairId)
+    joinroom("class" + classroomId)
+    // }
+
+    // return () => {
+    //   s.disconnect()
+    // }
+  }, [])
+  useEffect(() => {
+    if (!isSocket()) return
+    getSocket().on("invoice-retailer", (invoice) => {
+      console.log(invoice)
+      dispatch(setUnitPrice(invoice.price))
+      dispatch(setCreditTerms(invoice.creditTerm))
+      // setCreditLine(invoice.creditLine)
+      dispatch(setBargain(true))
+    })
+    getSocket().on("message", (message) => {
+      console.log(message)
+      if (message === "delivery") {
+        dispatch(setReceipt(true))
+        dispatch(setDisabled(false))
+      }
+    })
+  }, [getSocket()])
 
 
   return (

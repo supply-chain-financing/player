@@ -14,7 +14,8 @@ import FormControl from "@material-ui/core/FormControl";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
 import InputLabel from "@material-ui/core/InputLabel";
-
+import { setDisabled, setMadeProduct } from "../../redux/processSlice";
+import { useSelector, useDispatch } from "react-redux";
 const gif = "https://media.giphy.com/media/3ofSBe9MBRjtUH7leg/giphy.gif";
 
 const override = css`
@@ -110,9 +111,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function MadeProduct(props) {
+  const { madeProduct } = useSelector(state => state.process)
   const [check, setCheck] = useState(false);
   const [matchStatus, setMatchStatus] = useState(false);
-
+  const dispatch = useDispatch()
   const classes = useStyles();
 
   //判斷step
@@ -121,27 +123,9 @@ export default function MadeProduct(props) {
   }
   //click 跳過+axios
   function handleClick() {
-    if (matchStatus === false) {
-      setMatchStatus(true);
-      alert("Skip");
-    } else {
-      setMatchStatus(false);
-    }
-    // api
-    // axios
-    //   .post("")
-    //   .then(async (res) => {
-    //     if (res.status === 200) {
-    //       if (check === false) {
-    //         setCheck(true);
-    //       } else {
-    //         setCheck(false);
-    //       }
-    //     } else {
-    //       alert("error");
-    //     }
-    //   })
-    //   .catch((err) => {});
+    dispatch(setDisabled(false))
+    dispatch(setMadeProduct(true))
+    alert("商品製作完成!");
   }
 
   function renderSwitch(param) {
@@ -169,8 +153,8 @@ export default function MadeProduct(props) {
     <>
       <Block>
         <Word>
-          {matchStatus ? "製作完成!" : "製作產品中..."}
-          {matchStatus ? (
+          {madeProduct ? "製作完成!" : "製作產品中..."}
+          {madeProduct ? (
             ""
           ) : (
             <Button

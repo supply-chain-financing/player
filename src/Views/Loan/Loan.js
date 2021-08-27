@@ -8,6 +8,7 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import SendIcon from "@material-ui/icons/Send";
 import { useSelector, useDispatch } from "react-redux";
 import { RefreshAuthLogic } from "../../refreshAuthLogic";
+import { setCash } from "../../redux/userSlice";
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import InputBase from "@material-ui/core/InputBase";
 const Block = styled.div`
@@ -119,6 +120,7 @@ export default function Loan() {
   const refreshAuthLogic = RefreshAuthLogic()
   createAuthRefreshInterceptor(instance, refreshAuthLogic)
   const { user } = useSelector(state => state.user)
+  const { pair: { currentTime } } = useSelector(state => state.game)
   const [money, setMoney] = useState(0)
   const [check, setCheck] = useState(false)
   const [level, setlevel] = useState(user.flow.creditRating)
@@ -151,11 +153,12 @@ export default function Loan() {
   //click 還款 axios
   function handleClick() {
     instance
-      .post("http://localhost:3300/loangreement", { facilityAmount: money, borrowerId: user.userId, loanType: 'normal', loanStatus: 'unpaid', effectiveDate: new Date().toISOString().slice(0, 10), maturityDate: new Date(new Date().setMonth(new Date().getMonth() + user.industryId)).toISOString().slice(0, 10) }
+      .post("http://localhost:3300/loangreement", { facilityAmount: money, borrowerId: user.userId, loanType: 'normal', loanStatus: 'unpaid', effectiveDate: currentTime, maturityDate: new Date(new Date().setMonth(new Date(currentTime).getMonth() + user.industryId)).toISOString().slice(0, 10) }
       )
       .then(res => {
         setLoanMoney(res.data.loanagreement.facilityAmount)
         setloanMessage(res.data.message)
+        dispatch(setCash(parseInt(res.data.loanagreement.facilityAmount)))
         setCheck(true)
       })
       .catch((err) => {

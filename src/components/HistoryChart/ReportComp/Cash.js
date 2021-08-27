@@ -28,9 +28,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function Cash({ cash }) {
+export default function Cash({ cash, lastCash }) {
   // const [money, setMoney] = useState(cash)
-  const [lastMoney, setLastMoney] = useState(999);
+  // const [lastMoney, setLastMoney] = useState(999);
   const classes = useStyles();
   const theme = useTheme();
   return (
@@ -64,7 +64,7 @@ export default function Cash({ cash }) {
           上月底持有現金
         </Typography>
         <Typography style={{ color: "blue" }} variant="caption">
-          {lastMoney}
+          {lastCash}
         </Typography>
       </Box>
     </>

@@ -119,7 +119,7 @@ export default function Repayment() {
   return (
     <>
       <Block>
-        <Word>借款契約</Word>
+        <Word>借貸還款</Word>
         <Content>
           <ContentWord>金額</ContentWord>
           <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>

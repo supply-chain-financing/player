@@ -14,7 +14,8 @@ import FormControl from "@material-ui/core/FormControl";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
 import InputLabel from "@material-ui/core/InputLabel";
-
+import { setDisabled, setDelivery, setReceipt } from "../../redux/processSlice";
+import { useSelector, useDispatch } from "react-redux";
 const gif = "https://media.giphy.com/media/rVotkcnqOuys0/giphy.gif";
 
 const override = css`
@@ -110,39 +111,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function ReceiptDate(props) {
-  const [check, setCheck] = useState(false);
-  const [matchStatus, setMatchStatus] = useState(false);
-
+  // const [check, setCheck] = useState(false);
+  // const [matchStatus, setMatchStatus] = useState(false);
+  const { receipt } = useSelector(state => state.process)
   const classes = useStyles();
+  const dispatch = useDispatch()
   //判斷step
   if (props.currentStep !== 2) {
     return null;
   }
 
-  //click 還款 axios
-  function handleClick() {
-    if (matchStatus === false) {
-      setMatchStatus(true);
-      alert("Skip");
-    } else {
-      setMatchStatus(false);
-    }
-    // api
-    // axios
-    //   .post("")
-    //   .then(async (res) => {
-    //     if (res.status === 200) {
-    //       if (check === false) {
-    //         setCheck(true);
-    //       } else {
-    //         setCheck(false);
-    //       }
-    //     } else {
-    //       alert("error");
-    //     }
-    //   })
-    //   .catch((err) => {});
-  }
+
   //從等供應商定價畫面 => 議價表單出來
   //如果有match成功 則換成Tick畫面
   function renderSwitch(param) {
@@ -170,25 +149,9 @@ export default function ReceiptDate(props) {
     <>
       <Block>
         <Word>
-          {matchStatus ? "完成收貨!" : "收貨中..."}
-          {matchStatus ? (
-            ""
-          ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              size="sl"
-              className={classes.button}
-              style={{}}
-              endIcon={<SendIcon />}
-              onClick={handleClick}
-            >
-              Skip
-            </Button>
-          )}
+          {receipt ? "完成收貨!" : "收貨中..."}
         </Word>
-
-        {renderSwitch(matchStatus)}
+        {renderSwitch(receipt)}
       </Block>
     </>
   );

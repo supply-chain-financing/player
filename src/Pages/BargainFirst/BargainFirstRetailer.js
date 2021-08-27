@@ -274,13 +274,13 @@ export default function BargainFirst_retailer({ }) {
           <>
             <Word>契約產生</Word>
             <Content>
-              <ContentWord>價格</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
+              <ContentWord>價格/單價</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>{invoice.unitPrice}</ContentWord>
             </Content>
             <Content>
               <ContentWord>Credit Term</ContentWord>
               <ContentWord style={{ color: "#757ce8" }}>
-                {creditTerm}
+                {invoice.creditTerms}
               </ContentWord>
             </Content>
             {/* <Content>

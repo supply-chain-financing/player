@@ -124,7 +124,6 @@ export default function BargainFirstSupplier({ }) {
   const { user: { userId } } = useSelector(state => state.user)
   const { pair: { pairId } } = useSelector(state => state.game)
   const { invoice } = useSelector(state => state.invoice)
-  //const [invoice, setInvoice] = useState()
   const classes = useStyles()
   const dispatch = useDispatch()
   let history = useHistory()
@@ -246,7 +245,7 @@ export default function BargainFirstSupplier({ }) {
           <>
             <Word>等待企業傳送契約</Word>
             <Loading />
-            <Button
+            {/* <Button
               variant="contained"
               color="primary"
               size="large"
@@ -254,7 +253,7 @@ export default function BargainFirstSupplier({ }) {
               endIcon={<SendIcon />}
             >
               下一步
-            </Button>
+            </Button> */}
           </>
         );
       case "final":
@@ -262,13 +261,13 @@ export default function BargainFirstSupplier({ }) {
           <>
             <Word>契約產生</Word>
             <Content>
-              <ContentWord>價格</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{money}</ContentWord>
+              <ContentWord>價格/單價</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>{invoice.unitPrice}</ContentWord>
             </Content>
             <Content>
               <ContentWord>Credit Term</ContentWord>
               <ContentWord style={{ color: "#757ce8" }}>
-                {creditTerm}
+                {invoice.creditTerms}
               </ContentWord>
             </Content>
             {/* <Content>
@@ -279,7 +278,7 @@ export default function BargainFirstSupplier({ }) {
             </Content> */}
             <Content>
               <ContentWord>數量</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{amount}</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>{invoice.amount}</ContentWord>
             </Content>
             <Content>
               <ContentWord>交易日</ContentWord>

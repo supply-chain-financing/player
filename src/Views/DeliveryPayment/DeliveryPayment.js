@@ -9,6 +9,9 @@ import SendIcon from "@material-ui/icons/Send";
 import { useSelector, useDispatch } from "react-redux";
 import { RefreshAuthLogic } from "../../refreshAuthLogic";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
+import { initiateSocket, disconnectSocket, getSocket } from '../../socket';
+import { setDisabled, setDeliveryPayment, setFinishRetailer } from "../../redux/processSlice";
+import { setCash } from "../../redux/userSlice";
 const Block = styled.div`
   position: static;
   padding: 30px;
@@ -90,8 +93,11 @@ export default function DeliveryPayment(props) {
   });
   //auto handle request when accessToken was expired
   const refreshAuthLogic = RefreshAuthLogic();
-  createAuthRefreshInterceptor(instance, refreshAuthLogic);
-  const { invoice } = useSelector((state) => state.invoice);
+  createAuthRefreshInterceptor(instance, refreshAuthLogic)
+  const dispatch = useDispatch()
+  const { invoice } = useSelector((state) => state.invoice)
+  const { pair: { pairId } } = useSelector(state => state.game)
+  const { deliveryPayment } = useSelector(state => state.process)
   const [day, setDay] = useState("6/28");
   const [creditLine, setCreditLine] = useState("7/28");
   const [money, setMoney] = useState(0);
@@ -106,18 +112,20 @@ export default function DeliveryPayment(props) {
   }
   //click 還款 axios
   function handleClick() {
-    // if (check === false) {
-    //   setCheck(true);
-    // } else {
-    //   setCheck(false);
-    // }
     instance
       .patch("http://localhost:3300/flows/cash", {
+        invoiceId: invoice.invoiceId,
+        type: "payment",
         cash: invoice.payable,
         supplierId,
         pairCreatedAt: createdAt,
       })
       .then((res) => {
+        getSocket().emit("sendMessage", { type: "deliveryPayment", cash: invoice.payable }, pairId)
+        dispatch(setCash(-invoice.payable))
+        dispatch(setDeliveryPayment(true))
+        dispatch(setFinishRetailer(true))
+        dispatch(setDisabled(false))
         alert("還款成功!");
       })
       .catch((err) => {
@@ -147,12 +155,12 @@ export default function DeliveryPayment(props) {
           </ContentWord>
         </Content>
         <Content style={{ width: "40vw", height: "70px", marginLeft: "9%" }}>
-          <Alert variant="success" show={check}>
+          <Alert variant="success" show={deliveryPayment}>
             🦶款成功！
           </Alert>
         </Content>
         <ContentFooter style={{}}>
-          <Button
+          {deliveryPayment ? (null) : (<Button
             variant="contained"
             color="primary"
             size="large"
@@ -161,7 +169,7 @@ export default function DeliveryPayment(props) {
             onClick={handleClick}
           >
             進行還款
-          </Button>
+          </Button>)}
         </ContentFooter>
       </Block>
     </>

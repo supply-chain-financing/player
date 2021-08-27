@@ -8,8 +8,20 @@ const invoiceSlice = createSlice({
     reducers: {
         setInvoice: (state, action) => {
             state.invoice = action.payload
-        }
+        },
+        setAmount: (state, action) => {
+            state.invoice.amount = action.payload
+        },
+        setCreditTerms: (state, action) => {
+            state.invoice.creditTerms = action.payload
+        },
+        setPayable: (state, action) => {
+            state.invoice.payable = action.payload
+        },
+        setUnitPrice: (state, action) => {
+            state.invoice.unitPrice = action.payload
+        },
     },
 })
-export const { setInvoice } = invoiceSlice.actions
+export const { setInvoice, setAmount, setCreditTerms, setPayable, setUnitPrice } = invoiceSlice.actions
 export default invoiceSlice.reducer
