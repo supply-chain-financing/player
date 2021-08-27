@@ -121,6 +121,7 @@ export default function Merchandise(props) {
   const classes = useStyles()
   const { accessToken } = useSelector(state => state.accessToken)
   const { user: { userId } } = useSelector(state => state.user)
+  const { pair: { createdAt } } = useSelector(state => state.game)
   //auto handle request when accessToken was expired
   const instance = axios.create({
     withCredentials: true,
@@ -157,13 +158,17 @@ export default function Merchandise(props) {
         userId,
         type: "sellproduct",
         cash: 3000,
+        pairCreatedAt: createdAt
       })
       .then((res) => {
+        console.log(res.status)
         //要根據供需表決定賣出的商品價格
-        dispatch(setCash(3000))
-        dispatch(setMerchandise(true))
-        dispatch(setDisabled(false))
-        alert("賣出商品!");
+        if (res.status == 200) {
+          dispatch(setCash(3000))
+          dispatch(setMerchandise(true))
+          dispatch(setDisabled(false))
+          alert("賣出商品!");
+        }
       })
       .catch((err) => {
         console.log(err);

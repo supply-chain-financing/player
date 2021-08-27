@@ -147,7 +147,6 @@ export default function Sidebar(props) {
   const [notifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const popOpen = Boolean(anchorEl);
-
   const handlePopoverOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -213,15 +212,17 @@ export default function Sidebar(props) {
       dispatch(setCreditTerms(invoice.creditTerm))
       // setCreditLine(invoice.creditLine)
       dispatch(setBargain(true))
+      console.log("這樣呢")
     })
     getSocket().on("message", (message) => {
       console.log(message)
       if (message === "delivery") {
         dispatch(setReceipt(true))
         dispatch(setDisabled(false))
+        console.log("測試")
       }
     })
-  }, [getSocket()])
+  }, [])
 
 
   return (

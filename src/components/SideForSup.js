@@ -216,6 +216,7 @@ export default function SideForSup(props) {
       dispatch(setInvoice(invoice))
       dispatch(setBargainSupplier("final"))
       dispatch(setDisabled(false))
+      console.log("希望只有一次QQ")
     })
     getSocket().on("message", (message) => {
       console.log(message)
@@ -224,9 +225,10 @@ export default function SideForSup(props) {
         dispatch(setDisabled(false))
         //this is weird!!!!!乾為什麼
         dispatch(setCash(parseInt(message.cash)))
+        console.log("hihihi")
       }
     })
-  }, [getSocket()])
+  }, [])
   return (
     <div className={classes.root}>
       <CssBaseline />
