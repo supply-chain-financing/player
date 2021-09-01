@@ -54,7 +54,7 @@ const Block = styled.div`
   position: static;
   padding: 30px;
   width: 700px;
-  height: 480px;
+  height: 700px;
   margin-top: 10%;
   margin-left: 30vw;
   text-align: left;
@@ -113,46 +113,50 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BargainFirstSupplier({ }) {
-  const [socket, setSocket] = useState()
-  const [money, setMoney] = useState()
-  const [creditTerm, setCreditTerm] = useState(0)
+export default function BargainFirstSupplier({}) {
+  const [socket, setSocket] = useState();
+  const [money, setMoney] = useState();
+  const [creditTerm, setCreditTerm] = useState(0);
   //const [creditLine, setCreditLine] = useState(0)
-  const [amount, setAmount] = useState(0)
-  const [status, setStatus] = useState("true")
-  const [isFocused, setIsFocused] = useState(false)
-  const { user: { userId } } = useSelector(state => state.user)
-  const { pair: { pairId } } = useSelector(state => state.game)
-  const { invoice } = useSelector(state => state.invoice)
-  const classes = useStyles()
-  const dispatch = useDispatch()
-  let history = useHistory()
+  const [amount, setAmount] = useState(0);
+  const [status, setStatus] = useState("true");
+  const [isFocused, setIsFocused] = useState(false);
+  const {
+    user: { userId },
+  } = useSelector((state) => state.user);
+  const {
+    pair: { pairId },
+  } = useSelector((state) => state.game);
+  const { invoice } = useSelector((state) => state.invoice);
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  let history = useHistory();
 
   const handleFocus = () => {
     setIsFocused(true);
   };
   useEffect(() => {
-    const s = io("http://localhost:3300")
-    setSocket(s)
-    console.log(s)
-    s.emit("join", pairId)
+    const s = io("http://localhost:3300");
+    setSocket(s);
+    console.log(s);
+    s.emit("join", pairId);
     return () => {
-      s.disconnect()
-    }
-  }, [])
+      s.disconnect();
+    };
+  }, []);
   useEffect(() => {
-    if (socket == null) return
+    if (socket == null) return;
     socket.on("invoice-supplier", (invoice) => {
-      console.log(invoice)
-      setAmount(invoice.amount)
-      dispatch(setInvoice(invoice))
-      setStatus("final")
-    })
-  }, [socket])
+      console.log(invoice);
+      setAmount(invoice.amount);
+      dispatch(setInvoice(invoice));
+      setStatus("final");
+    });
+  }, [socket]);
   function tempSubmit(e) {
-    e.preventDefault()
-    setStatus("false")
-    socket.emit("sendInvoiceSupplier", { price: money, creditTerm }, pairId)
+    e.preventDefault();
+    setStatus("false");
+    socket.emit("sendInvoiceSupplier", { price: money, creditTerm }, pairId);
   }
   function handleIntoAdmin() {
     history.push("/supplieradmin");
@@ -262,7 +266,9 @@ export default function BargainFirstSupplier({ }) {
             <Word>契約產生</Word>
             <Content>
               <ContentWord>價格/單價</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{invoice.unitPrice}</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.unitPrice}
+              </ContentWord>
             </Content>
             <Content>
               <ContentWord>Credit Term</ContentWord>
@@ -278,7 +284,9 @@ export default function BargainFirstSupplier({ }) {
             </Content> */}
             <Content>
               <ContentWord>數量</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{invoice.amount}</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.amount}
+              </ContentWord>
             </Content>
             <Content>
               <ContentWord>交易日</ContentWord>

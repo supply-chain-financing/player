@@ -16,7 +16,7 @@ import {
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { RefreshAuthLogic } from "../../refreshAuthLogic";
-import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import createAuthRefreshInterceptor from "axios-auth-refresh";
 import axios from "axios";
 import { setFlow } from "../../redux/userSlice";
 
@@ -30,7 +30,6 @@ import LastCash from "./ReportComp/LastCash";
 import LastInventory from "./ReportComp/LastInventory";
 import LastLiability from "./ReportComp/LastLiability";
 import { Switch } from "react-router";
-
 
 const Block = styled.div`
   position: static;
@@ -106,23 +105,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Report() {
-  const { accessToken } = useSelector(state => state.accessToken)
+  const { accessToken } = useSelector((state) => state.accessToken);
   //auto handle request when accessToken was expired
   const instance = axios.create({
     withCredentials: true,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
   //auto handle request when accessToken was expired
-  const refreshAuthLogic = RefreshAuthLogic()
-  createAuthRefreshInterceptor(instance, refreshAuthLogic)
-  const dispatch = useDispatch()
-  const { user: { flow } } = useSelector(state => state.user)
+  const refreshAuthLogic = RefreshAuthLogic();
+  createAuthRefreshInterceptor(instance, refreshAuthLogic);
+  const dispatch = useDispatch();
+  const {
+    user: { flow },
+  } = useSelector((state) => state.user);
   const [report, setReport] = useState("");
   const [open, setOpen] = useState(false);
-  const [records, setRecords] = useState("")
-  const [lastRecord, setLastRecord] = useState("")
+  const [records, setRecords] = useState("");
+  const [lastRecord, setLastRecord] = useState("");
   const classes = useStyles();
   const handleChange = (event) => {
     setReport(event.target.value);
@@ -150,37 +151,42 @@ export default function Report() {
   }
   useEffect(() => {
     instance
-      .get("http://localhost:3300/flows/me",
-    )
-      .then(res => {
-        dispatch(setFlow(res.data.flow))
+      .get("http://localhost:3300/flows/me")
+      .then((res) => {
+        dispatch(setFlow(res.data.flow));
       })
       .catch((err) => {
         console.log(err);
-      })
+      });
     instance
-      .get("http://localhost:3300/records/me",
-    )
-      .then(res => {
-        setRecords(res.data.records)
-        if (res.data.records) {
-          setLastRecord(res.data.records[0])
+      .get("http://localhost:3300/records/me")
+      .then((res) => {
+        setRecords(res.data.records);
+        if (res.data.records.length) {
+          setLastRecord(res.data.records[0]);
         } else {
-          setLastRecord({ creditRating: "無", cash: "無", inventory: "無", liability: "無" })
+          setLastRecord({
+            creditRating: "無",
+            cash: "無",
+            inventory: "無",
+            liability: "無",
+          });
         }
-
       })
       .catch((err) => {
         console.log(err);
-      })
-  }, [])
+      });
+  }, []);
 
   return (
     <>
       <Block>
         <Card className={classes.root}>
           <CardContent>
-            <CreditRating creditRating={flow.creditRating} lastCreditRating={lastRecord.creditRating} />
+            <CreditRating
+              creditRating={flow.creditRating}
+              lastCreditRating={lastRecord.creditRating}
+            />
           </CardContent>
         </Card>
         <Card className={classes.root}>
@@ -190,12 +196,18 @@ export default function Report() {
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Inventory inventory={flow.inventory} lastInventory={lastRecord.inventory} />
+            <Inventory
+              inventory={flow.inventory}
+              lastInventory={lastRecord.inventory}
+            />
           </CardContent>
         </Card>
         <Card className={classes.root}>
           <CardContent>
-            <Liability liability={flow.liability} lastLiability={lastRecord.liability} />
+            <Liability
+              liability={flow.liability}
+              lastLiability={lastRecord.liability}
+            />
           </CardContent>
         </Card>
       </Block>

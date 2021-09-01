@@ -13,7 +13,7 @@ import { css } from "@emotion/react";
 import { io } from "socket.io-client";
 import { useSelector, useDispatch } from "react-redux";
 import { RefreshAuthLogic } from "../../refreshAuthLogic";
-import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import createAuthRefreshInterceptor from "axios-auth-refresh";
 import { setInvoice } from "../../redux/invoiceSlice";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import InputBase from "@material-ui/core/InputBase";
@@ -56,7 +56,7 @@ const Block = styled.div`
   position: static;
   padding: 30px;
   width: 700px;
-  height: 480px;
+  height: 700px;
   margin-top: 10%;
   margin-left: 30vw;
   text-align: left;
@@ -115,49 +115,53 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BargainFirst_retailer({ }) {
-  const { accessToken } = useSelector(state => state.accessToken)
+export default function BargainFirst_retailer({}) {
+  const { accessToken } = useSelector((state) => state.accessToken);
   //auto handle request when accessToken was expired
   const instance = axios.create({
     withCredentials: true,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
   //auto handle request when accessToken was expired
-  const refreshAuthLogic = RefreshAuthLogic()
-  createAuthRefreshInterceptor(instance, refreshAuthLogic)
-  const [socket, setSocket] = useState()
-  const [money, setMoney] = useState(0)
-  const [creditTerm, setCreditTerm] = useState(0)
+  const refreshAuthLogic = RefreshAuthLogic();
+  createAuthRefreshInterceptor(instance, refreshAuthLogic);
+  const [socket, setSocket] = useState();
+  const [money, setMoney] = useState(0);
+  const [creditTerm, setCreditTerm] = useState(0);
   //const [creditLine, setCreditLine] = useState(0)
-  const [amount, setAmount] = useState("")
-  const [status, setStatus] = useState("true")
-  const [isFocused, setIsFocused] = useState(false)
-  const { user: { userId, industryId } } = useSelector(state => state.user)
-  const { pair: { pairId, supplierId, retailerId } } = useSelector(state => state.game)
-  const { invoice } = useSelector(state => state.invoice)
-  const dispatch = useDispatch()
+  const [amount, setAmount] = useState("");
+  const [status, setStatus] = useState("true");
+  const [isFocused, setIsFocused] = useState(false);
+  const {
+    user: { userId, industryId },
+  } = useSelector((state) => state.user);
+  const {
+    pair: { pairId, supplierId, retailerId },
+  } = useSelector((state) => state.game);
+  const { invoice } = useSelector((state) => state.invoice);
+  const dispatch = useDispatch();
   useEffect(() => {
-    const s = io("http://localhost:3300")
-    setSocket(s)
-    console.log(s)
-    s.emit("join", pairId)
-    setStatus("false")
+    const s = io("http://localhost:3300");
+    setSocket(s);
+    console.log(s);
+    s.emit("join", pairId);
+    setStatus("false");
     return () => {
-      s.disconnect()
-    }
-  }, [])
+      s.disconnect();
+    };
+  }, []);
   useEffect(() => {
-    if (socket == null) return
+    if (socket == null) return;
     socket.on("invoice-retailer", (invoice) => {
-      console.log(invoice)
-      setMoney(invoice.price)
-      setCreditTerm(invoice.creditTerm)
+      console.log(invoice);
+      setMoney(invoice.price);
+      setCreditTerm(invoice.creditTerm);
       // setCreditLine(invoice.creditLine)
-      setStatus("true")
-    })
-  }, [socket])
+      setStatus("true");
+    });
+  }, [socket]);
   const classes = useStyles();
   let history = useHistory();
 
@@ -169,20 +173,41 @@ export default function BargainFirst_retailer({ }) {
   };
 
   function tempSubmit(e) {
-    e.preventDefault()
-    setStatus("createInvoice")
+    e.preventDefault();
+    setStatus("createInvoice");
     instance
-      .post("http://localhost:3300/invoice", { amount, creditTerms: new Date(new Date().setMonth(new Date().getMonth() + parseInt(creditTerm))).toISOString().slice(0, 10), unitPrice: money, transactionDate: new Date().toISOString().slice(0, 10), paymentDate: new Date(new Date().setMonth(new Date().getMonth() + industryId)).toISOString().slice(0, 10), deliveryDate: new Date(new Date().setMonth(new Date().getMonth() + industryId)).toISOString().slice(0, 10), payable: money * amount, retailerId, supplierId }
-      )
-      .then(res => {
+      .post("http://localhost:3300/invoice", {
+        amount,
+        creditTerms: new Date(
+          new Date().setMonth(new Date().getMonth() + parseInt(creditTerm))
+        )
+          .toISOString()
+          .slice(0, 10),
+        unitPrice: money,
+        transactionDate: new Date().toISOString().slice(0, 10),
+        paymentDate: new Date(
+          new Date().setMonth(new Date().getMonth() + industryId)
+        )
+          .toISOString()
+          .slice(0, 10),
+        deliveryDate: new Date(
+          new Date().setMonth(new Date().getMonth() + industryId)
+        )
+          .toISOString()
+          .slice(0, 10),
+        payable: money * amount,
+        retailerId,
+        supplierId,
+      })
+      .then((res) => {
         // alert(res.data.invoice)
-        socket.emit("sendInvoiceRetailer", res.data.invoice, pairId)
-        dispatch(setInvoice(res.data.invoice))
-        setStatus("final")
+        socket.emit("sendInvoiceRetailer", res.data.invoice, pairId);
+        dispatch(setInvoice(res.data.invoice));
+        setStatus("final");
       })
       .catch((err) => {
         console.log(err);
-      })
+      });
   }
   function validateForm() {
     return amount != "";
@@ -275,7 +300,9 @@ export default function BargainFirst_retailer({ }) {
             <Word>契約產生</Word>
             <Content>
               <ContentWord>價格/單價</ContentWord>
-              <ContentWord style={{ color: "#757ce8" }}>{invoice.unitPrice}</ContentWord>
+              <ContentWord style={{ color: "#757ce8" }}>
+                {invoice.unitPrice}
+              </ContentWord>
             </Content>
             <Content>
               <ContentWord>Credit Term</ContentWord>
