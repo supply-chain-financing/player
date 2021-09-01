@@ -359,6 +359,8 @@ export default function Investment() {
                       id="filled-number"
                       label="Number"
                       type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
                       InputLabelProps={{
                         shrink: true,
                       }}
